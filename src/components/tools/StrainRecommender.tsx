@@ -101,9 +101,9 @@ export default function StrainRecommender() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(answers),
       });
-      const data = await response.json();
+      const data = await response.json().catch(() => ({ error: `Server error (${response.status})` }));
       if (!response.ok) {
-        throw new Error(data.error || "Failed to get recommendations");
+        throw new Error(data.error || `Request failed with status ${response.status}`);
       }
       setResults(data.recommendations);
     } catch (err) {
