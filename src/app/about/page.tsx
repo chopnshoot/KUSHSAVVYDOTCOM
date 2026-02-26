@@ -51,16 +51,12 @@ export default function AboutPage() {
             covering all 50 states.
           </p>
           <p>
-            Beyond tools, we maintain a{" "}
-            <Link href="/strains" className="text-accent-green hover:text-accent-green-light">
-              strain directory
-            </Link>{" "}
-            with detailed profiles of popular strains, and a{" "}
+            Beyond tools, we publish a{" "}
             <Link href="/learn" className="text-accent-green hover:text-accent-green-light">
               learning center
             </Link>{" "}
             with in-depth articles covering everything from terpene science to
-            beginner guides.
+            beginner guides, helping you make informed decisions about cannabis.
           </p>
 
           <h2 className="font-heading text-2xl text-text-primary mt-10">Our Approach</h2>

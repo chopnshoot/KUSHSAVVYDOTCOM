@@ -1,18 +1,17 @@
 import Link from "next/link";
 import { tools } from "@/lib/tools-data";
-import { seedStrains } from "@/lib/seed-strains";
+import { seedArticles, slugifyArticle } from "@/lib/seed-articles";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import StrainCard from "@/components/ui/StrainCard";
 import ToolCard from "@/components/ui/ToolCard";
 import NewsletterSignup from "@/components/ui/NewsletterSignup";
 
 export default function HomePage() {
-  const featuredStrains = seedStrains.slice(0, 10);
   const featuredTools = tools
     .filter((t) => t.available)
     .concat(tools.filter((t) => !t.available))
     .slice(0, 6);
+  const latestArticles = seedArticles.slice(0, 6);
 
   return (
     <>
@@ -92,48 +91,63 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Featured Strains */}
+        {/* Latest Guides */}
         <section className="bg-tool-bg py-16 md:py-24">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-center justify-between mb-12">
               <div>
-                <h2 className="section-heading mb-2">Popular Strains</h2>
+                <h2 className="section-heading mb-2">Latest Guides</h2>
                 <p className="text-text-secondary text-lg">
-                  Explore the most popular cannabis strains
+                  Learn everything about cannabis with our in-depth articles
                 </p>
               </div>
               <Link
-                href="/strains"
+                href="/learn"
                 className="hidden md:inline-flex btn-secondary text-sm px-4 py-2"
               >
                 View All
               </Link>
             </div>
-            <div className="flex gap-6 overflow-x-auto pb-4 -mx-4 px-4">
-              {featuredStrains.map((strain) => (
-                <div
-                  key={strain.name}
-                  className="min-w-[280px] flex-shrink-0"
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {latestArticles.map((article) => (
+                <Link
+                  key={article.title}
+                  href={`/learn/${slugifyArticle(article.title)}`}
+                  className="group rounded-card border border-border bg-surface overflow-hidden transition-shadow hover:shadow-md"
                 >
-                  <StrainCard
-                    name={strain.name}
-                    slug={strain.name
-                      .toLowerCase()
-                      .replace(/[^a-z0-9]+/g, "-")}
-                    type={strain.type}
-                    thcMin={strain.thcMin}
-                    thcMax={strain.thcMax}
-                    effects={strain.effects.slice(0, 3)}
-                  />
-                </div>
+                  <div className="h-32 bg-tag-bg flex items-center justify-center">
+                    <span className="text-3xl text-text-tertiary/50">
+                      {article.category === "Beginner Guides"
+                        ? "📖"
+                        : article.category === "Science"
+                          ? "🔬"
+                          : article.category === "Edibles"
+                            ? "🍪"
+                            : article.category === "Strains"
+                              ? "🌿"
+                              : "📝"}
+                    </span>
+                  </div>
+                  <div className="p-5">
+                    <span className="tag text-xs mb-2 inline-block">
+                      {article.category}
+                    </span>
+                    <h3 className="font-heading text-base font-semibold text-text-primary group-hover:text-accent-green transition-colors line-clamp-2">
+                      {article.title}
+                    </h3>
+                    <p className="text-text-secondary text-sm mt-2 line-clamp-2">
+                      {article.excerpt}
+                    </p>
+                  </div>
+                </Link>
               ))}
             </div>
             <div className="text-center mt-6 md:hidden">
               <Link
-                href="/strains"
+                href="/learn"
                 className="text-accent-green hover:text-accent-green-light font-medium transition-colors"
               >
-                View all strains &rarr;
+                View all articles &rarr;
               </Link>
             </div>
           </div>
@@ -172,8 +186,8 @@ export default function HomePage() {
                 Get AI Recommendations
               </h3>
               <p className="text-text-secondary">
-                Our AI analyzes your preferences and matches you with
-                strains from our comprehensive database.
+                Our AI analyzes your preferences and matches you with the
+                perfect strains using deep cannabis knowledge.
               </p>
             </div>
             <div className="text-center">
@@ -186,8 +200,8 @@ export default function HomePage() {
                 Explore &amp; Learn
               </h3>
               <p className="text-text-secondary">
-                Dive into detailed strain profiles, calculate dosages, check
-                legality, and educate yourself.
+                Dive into detailed guides, calculate dosages, check legality,
+                and find your strains at local dispensaries.
               </p>
             </div>
           </div>

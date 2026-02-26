@@ -11,19 +11,19 @@ const footerLinkGroups: FooterLinkGroup[] = [
   {
     title: "Tools",
     links: [
-      { label: "Strain Finder", href: "/tools/strain-finder" },
-      { label: "Dosage Calculator", href: "/tools/dosage-calculator" },
-      { label: "Tolerance Guide", href: "/tools/tolerance-guide" },
-      { label: "Terpene Explorer", href: "/tools/terpene-explorer" },
+      { label: "Strain Recommender", href: "/tools/strain-recommender" },
+      { label: "Dosage Calculator", href: "/tools/edible-dosage-calculator" },
+      { label: "Strain Comparison", href: "/tools/strain-compare" },
+      { label: "Terpene Guide", href: "/tools/terpene-guide" },
     ],
   },
   {
     title: "Resources",
     links: [
-      { label: "Strain Library", href: "/strains" },
       { label: "Learn", href: "/learn" },
-      { label: "Blog", href: "/blog" },
-      { label: "FAQ", href: "/faq" },
+      { label: "Is It Legal?", href: "/tools/is-it-legal" },
+      { label: "Cost Calculator", href: "/tools/cost-calculator" },
+      { label: "Tolerance Planner", href: "/tools/tolerance-break-planner" },
     ],
   },
   {
@@ -32,16 +32,14 @@ const footerLinkGroups: FooterLinkGroup[] = [
       { label: "State Laws", href: "/legal" },
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms of Service", href: "/terms" },
-      { label: "Disclaimer", href: "/disclaimer" },
     ],
   },
   {
     title: "Company",
     links: [
       { label: "About", href: "/about" },
-      { label: "Contact", href: "/contact" },
-      { label: "Careers", href: "/careers" },
-      { label: "Press", href: "/press" },
+      { label: "Newsletter", href: "/newsletter" },
+      { label: "All Tools", href: "/tools" },
     ],
   },
 ];

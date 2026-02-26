@@ -24,7 +24,7 @@ const faqs = [
   {
     question: "What if I do not like the recommended strains?",
     answer:
-      "You can retake the quiz with different preferences to get new recommendations. You can also browse our full strain directory to explore strains on your own, or use our Strain Comparison tool to compare specific strains.",
+      "You can retake the quiz with different preferences to get new recommendations. You can also use our Strain Comparison tool to compare specific strains side by side, or search for strains on Leafly and Weedmaps.",
   },
   {
     question: "Do I need an account to use the recommender?",

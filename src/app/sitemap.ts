@@ -1,12 +1,7 @@
 import { MetadataRoute } from "next";
-import { seedStrains } from "@/lib/seed-strains";
 import { seedStateLaws } from "@/lib/seed-states";
 import { seedArticles, slugifyArticle } from "@/lib/seed-articles";
 import { tools } from "@/lib/tools-data";
-
-function slugify(name: string) {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-}
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kushsavvy.com";
@@ -14,7 +9,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [
     { url: baseUrl, changeFrequency: "weekly" as const, priority: 1 },
     { url: `${baseUrl}/tools`, changeFrequency: "weekly" as const, priority: 0.9 },
-    { url: `${baseUrl}/strains`, changeFrequency: "weekly" as const, priority: 0.9 },
     { url: `${baseUrl}/learn`, changeFrequency: "weekly" as const, priority: 0.8 },
     { url: `${baseUrl}/legal`, changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/about`, changeFrequency: "monthly" as const, priority: 0.5 },
@@ -31,14 +25,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     }));
 
-  const strainPages = seedStrains.map((strain) => ({
-    url: `${baseUrl}/strains/${slugify(strain.name)}`,
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
-  }));
-
   const statePages = seedStateLaws.map((state) => ({
-    url: `${baseUrl}/legal/${slugify(state.state)}`,
+    url: `${baseUrl}/legal/${state.state.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }));
@@ -50,5 +38,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(article.publishedAt),
   }));
 
-  return [...staticPages, ...toolPages, ...strainPages, ...statePages, ...articlePages];
+  return [...staticPages, ...toolPages, ...statePages, ...articlePages];
 }
