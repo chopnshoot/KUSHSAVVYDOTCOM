@@ -1,7 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import strainNames from "@/data/strain-names.json";
+import TurnstileWidget from "@/components/ui/TurnstileWidget";
+import RateLimitPrompt from "@/components/ui/RateLimitPrompt";
+import UsageCounter from "@/components/ui/UsageCounter";
 
 interface StrainInfo {
   name: string;
@@ -128,20 +131,49 @@ export default function StrainCompare() {
   const [result, setResult] = useState<CompareResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [rateLimited, setRateLimited] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
+
+  const handleTurnstileVerify = useCallback((token: string) => {
+    setTurnstileToken(token);
+  }, []);
 
   const handleCompare = async () => {
     if (!strain1.trim() || !strain2.trim()) return;
     setLoading(true);
     setError("");
+    setRateLimited(false);
     try {
       const response = await fetch("/api/compare", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ strain1: strain1.trim(), strain2: strain2.trim() }),
+        body: JSON.stringify({
+          strain1: strain1.trim(),
+          strain2: strain2.trim(),
+          turnstileToken,
+        }),
       });
       const data = await response.json().catch(() => ({ error: `Server error (${response.status})` }));
+
+      if (response.status === 429) {
+        setRateLimited(true);
+        if (data.limit) {
+          setUsage({ used: data.limit, limit: data.limit });
+        }
+        return;
+      }
+
       if (!response.ok) throw new Error(data.error || `Request failed with status ${response.status}`);
       setResult(data);
+
+      // Update usage counter from response
+      if (data._rateLimit) {
+        setUsage({
+          used: data._rateLimit.limit - data._rateLimit.remaining,
+          limit: data._rateLimit.limit,
+        });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to generate comparison. Please try again.");
     } finally {
@@ -154,6 +186,13 @@ export default function StrainCompare() {
     setStrain2("");
     setResult(null);
     setError("");
+    setRateLimited(false);
+  };
+
+  const handleSubscribeUpgrade = () => {
+    setRateLimited(false);
+    // Re-submit the comparison after upgrading
+    handleCompare();
   };
 
   if (loading) {
@@ -166,6 +205,10 @@ export default function StrainCompare() {
         <p className="text-text-tertiary text-sm mt-2">This usually takes 5-10 seconds</p>
       </div>
     );
+  }
+
+  if (rateLimited) {
+    return <RateLimitPrompt onUpgraded={handleSubscribeUpgrade} />;
   }
 
   if (error) {
@@ -281,6 +324,7 @@ export default function StrainCompare() {
         <div className="text-center">
           <button onClick={handleReset} className="btn-secondary">Compare Different Strains</button>
         </div>
+        {usage && <UsageCounter used={usage.used} limit={usage.limit} />}
       </div>
     );
   }
@@ -314,6 +358,8 @@ export default function StrainCompare() {
           Compare Strains
         </button>
       </div>
+      <TurnstileWidget onVerify={handleTurnstileVerify} />
+      {usage && <UsageCounter used={usage.used} limit={usage.limit} />}
     </div>
   );
 }

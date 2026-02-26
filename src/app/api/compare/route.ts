@@ -1,8 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 export async function POST(request: NextRequest) {
   try {
+    const body = await request.json();
+
+    // Layer 1: Cloudflare Turnstile verification
+    const turnstileValid = await verifyTurnstile(body.turnstileToken);
+    if (!turnstileValid) {
+      return NextResponse.json(
+        { error: "Verification failed. Please refresh and try again." },
+        { status: 403 }
+      );
+    }
+
+    // Layer 2: Rate limiting
+    const rateLimit = await checkRateLimit(request);
+    if (rateLimit && !rateLimit.success) {
+      return NextResponse.json(
+        {
+          error: "rate_limited",
+          message: "Daily limit reached",
+          remaining: 0,
+          limit: rateLimit.limit,
+        },
+        { status: 429 }
+      );
+    }
+
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       console.error("ANTHROPIC_API_KEY is not set");
@@ -14,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     const anthropic = new Anthropic({ apiKey });
 
-    const { strain1, strain2 } = await request.json();
+    const { strain1, strain2 } = body;
 
     if (!strain1 || !strain2) {
       return NextResponse.json(
@@ -75,7 +102,16 @@ Return ONLY valid JSON with no additional text:
     }
 
     const result = JSON.parse(jsonMatch[0]);
-    return NextResponse.json(result);
+
+    // Include rate limit info in the response
+    const responseData = {
+      ...result,
+      _rateLimit: rateLimit
+        ? { remaining: rateLimit.remaining, limit: rateLimit.limit }
+        : undefined,
+    };
+
+    return NextResponse.json(responseData);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("Comparison error:", message);

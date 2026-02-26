@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import QuizStep from "@/components/ui/QuizStep";
 import StrainResultCard from "@/components/ui/StrainResultCard";
+import TurnstileWidget from "@/components/ui/TurnstileWidget";
+import RateLimitPrompt from "@/components/ui/RateLimitPrompt";
+import UsageCounter from "@/components/ui/UsageCounter";
 import { StrainRecommendation } from "@/lib/types";
 
 const quizSteps = [
@@ -72,6 +75,13 @@ export default function StrainRecommender() {
   const [results, setResults] = useState<StrainRecommendation[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [rateLimited, setRateLimited] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
+
+  const handleTurnstileVerify = useCallback((token: string) => {
+    setTurnstileToken(token);
+  }, []);
 
   const handleSelect = (value: string | string[]) => {
     const step = quizSteps[currentStep];
@@ -106,17 +116,36 @@ export default function StrainRecommender() {
   const submitQuiz = async () => {
     setLoading(true);
     setError("");
+    setRateLimited(false);
     try {
       const response = await fetch("/api/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(answers),
+        body: JSON.stringify({ ...answers, turnstileToken }),
       });
       const data = await response.json().catch(() => ({ error: `Server error (${response.status})` }));
+
+      if (response.status === 429) {
+        setRateLimited(true);
+        if (data.limit) {
+          setUsage({ used: data.limit, limit: data.limit });
+        }
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(data.error || `Request failed with status ${response.status}`);
       }
+
       setResults(data.recommendations);
+
+      // Update usage counter from response
+      if (data._rateLimit) {
+        setUsage({
+          used: data._rateLimit.limit - data._rateLimit.remaining,
+          limit: data._rateLimit.limit,
+        });
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to generate recommendations. Please try again."
@@ -131,6 +160,13 @@ export default function StrainRecommender() {
     setAnswers({});
     setResults(null);
     setError("");
+    setRateLimited(false);
+  };
+
+  const handleSubscribeUpgrade = () => {
+    setRateLimited(false);
+    // Re-submit the quiz after upgrading
+    submitQuiz();
   };
 
   if (loading) {
@@ -145,6 +181,10 @@ export default function StrainRecommender() {
         </p>
       </div>
     );
+  }
+
+  if (rateLimited) {
+    return <RateLimitPrompt onUpgraded={handleSubscribeUpgrade} />;
   }
 
   if (results) {
@@ -169,6 +209,7 @@ export default function StrainRecommender() {
             Try Again with Different Preferences
           </button>
         </div>
+        {usage && <UsageCounter used={usage.used} limit={usage.limit} />}
       </div>
     );
   }
@@ -217,6 +258,8 @@ export default function StrainRecommender() {
             : "Next"}
         </button>
       </div>
+      <TurnstileWidget onVerify={handleTurnstileVerify} />
+      {usage && <UsageCounter used={usage.used} limit={usage.limit} />}
     </div>
   );
 }
