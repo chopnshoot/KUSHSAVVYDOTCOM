@@ -145,13 +145,15 @@ export default function StrainResultCard({
         </div>
       </div>
 
-      {/* View Full Profile Link */}
-      <div className="mt-6 border-t border-border pt-4">
-        <button
-          type="button"
+      {/* Find This Strain - Affiliate Links */}
+      <div className="mt-6 border-t border-border pt-4 flex flex-wrap gap-3">
+        <a
+          href={`https://www.leafly.com/search?q=${encodeURIComponent(name)}`}
+          target="_blank"
+          rel="nofollow sponsored noopener"
           className="inline-flex items-center font-body text-sm font-medium text-accent-green transition-colors hover:text-accent-green-light"
         >
-          View full profile
+          Find on Leafly
           <svg
             className="ml-1 h-4 w-4"
             fill="none"
@@ -166,7 +168,29 @@ export default function StrainResultCard({
               d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
             />
           </svg>
-        </button>
+        </a>
+        <a
+          href={`https://weedmaps.com/search?q=${encodeURIComponent(name)}`}
+          target="_blank"
+          rel="nofollow sponsored noopener"
+          className="inline-flex items-center font-body text-sm font-medium text-text-secondary transition-colors hover:text-accent-green"
+        >
+          Find on Weedmaps
+          <svg
+            className="ml-1 h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+            />
+          </svg>
+        </a>
       </div>
     </div>
   );

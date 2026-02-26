@@ -1,28 +1,3 @@
-export interface Strain {
-  _id: string;
-  name: string;
-  slug: { current: string };
-  type: "Indica" | "Sativa" | "Hybrid";
-  ratio: string;
-  thcMin: number;
-  thcMax: number;
-  cbdMin: number;
-  cbdMax: number;
-  terpenes: Terpene[];
-  effects: string[];
-  negativeEffects: string[];
-  flavors: string[];
-  bestFor: string[];
-  description: string;
-  growDifficulty: "Easy" | "Moderate" | "Difficult";
-  floweringTime: string;
-  yieldIndoor: string;
-  image?: SanityImage;
-  popularity: number;
-  seoTitle: string;
-  seoDescription: string;
-}
-
 export interface Terpene {
   _id: string;
   name: string;
@@ -30,6 +5,7 @@ export interface Terpene {
   aroma: string;
   effects: string[];
   alsoFoundIn: string[];
+  commonStrains: string[];
   description: string;
   researchSummary: string;
   color: string;
@@ -69,7 +45,6 @@ export interface Article {
   featuredImage?: SanityImage;
   author: string;
   publishedAt: string;
-  relatedStrains: Strain[];
   relatedTools: string[];
   seoTitle: string;
   seoDescription: string;

@@ -1,47 +1,126 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import strainNames from "@/data/strain-names.json";
 
 interface StrainInfo {
   name: string;
   type: string;
+  ratio: string;
   thc_range: string;
   cbd_range: string;
-  top_effects: string[];
-  top_flavors: string[];
-  best_for: string;
   terpenes: string[];
+  effects: string[];
+  negativeEffects: string[];
+  flavors: string[];
+  bestFor: string;
 }
 
 interface CompareResult {
   strain1: StrainInfo;
   strain2: StrainInfo;
-  summary: string;
+  comparison: string;
+  verdict: string;
 }
-
-const popularStrains = [
-  "Blue Dream",
-  "OG Kush",
-  "Gorilla Glue",
-  "Girl Scout Cookies",
-  "Sour Diesel",
-  "Wedding Cake",
-  "Gelato",
-  "Jack Herer",
-  "Northern Lights",
-  "Granddaddy Purple",
-  "Green Crack",
-  "Pineapple Express",
-  "White Widow",
-  "AK-47",
-  "Purple Haze",
-];
 
 const typeColors: Record<string, string> = {
   Indica: "bg-indica/10 text-indica border-indica",
   Sativa: "bg-sativa/10 text-sativa border-sativa",
   Hybrid: "bg-hybrid/10 text-hybrid border-hybrid",
 };
+
+function AutocompleteInput({
+  value,
+  onChange,
+  placeholder,
+  label,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  placeholder: string;
+  label: string;
+}) {
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [highlightIndex, setHighlightIndex] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    if (value.length >= 1) {
+      const query = value.toLowerCase();
+      const filtered = strainNames
+        .filter((name: string) => name.toLowerCase().includes(query))
+        .slice(0, 8);
+      setSuggestions(filtered);
+    } else {
+      setSuggestions([]);
+    }
+    setHighlightIndex(-1);
+  }, [value]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showSuggestions || suggestions.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightIndex((prev) => Math.min(prev + 1, suggestions.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === "Enter" && highlightIndex >= 0) {
+      e.preventDefault();
+      onChange(suggestions[highlightIndex]);
+      setShowSuggestions(false);
+    } else if (e.key === "Escape") {
+      setShowSuggestions(false);
+    }
+  };
+
+  return (
+    <div className="relative">
+      <label className="block font-heading text-lg mb-3">{label}</label>
+      <input
+        ref={inputRef}
+        type="text"
+        value={value}
+        onChange={(e) => {
+          onChange(e.target.value);
+          setShowSuggestions(true);
+        }}
+        onFocus={() => setShowSuggestions(true)}
+        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+        onKeyDown={handleKeyDown}
+        placeholder={placeholder}
+        className="w-full p-4 rounded-xl border-2 border-border bg-surface text-text-primary font-body focus:border-accent-green focus:outline-none transition-colors"
+        autoComplete="off"
+      />
+      {showSuggestions && suggestions.length > 0 && (
+        <ul
+          ref={listRef}
+          className="absolute z-20 mt-1 w-full rounded-xl border border-border bg-surface shadow-lg max-h-60 overflow-y-auto"
+        >
+          {suggestions.map((name, i) => (
+            <li
+              key={name}
+              className={`px-4 py-2.5 cursor-pointer text-sm font-body transition-colors ${
+                i === highlightIndex
+                  ? "bg-accent-green/10 text-accent-green"
+                  : "text-text-primary hover:bg-tag-bg"
+              }`}
+              onMouseDown={() => {
+                onChange(name);
+                setShowSuggestions(false);
+              }}
+            >
+              {name}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 export default function StrainCompare() {
   const [strain1, setStrain1] = useState("");
@@ -111,6 +190,9 @@ export default function StrainCompare() {
                   {strain.type}
                 </span>
               </div>
+              {strain.ratio && (
+                <p className="font-mono text-xs text-text-tertiary mb-3">{strain.ratio}</p>
+              )}
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-text-tertiary">THC</span>
@@ -123,15 +205,25 @@ export default function StrainCompare() {
                 <div>
                   <span className="text-text-tertiary block mb-1">Effects</span>
                   <div className="flex flex-wrap gap-1">
-                    {strain.top_effects.map((e) => (
+                    {strain.effects.map((e) => (
                       <span key={e} className="tag text-xs">{e}</span>
                     ))}
                   </div>
                 </div>
+                {strain.negativeEffects && strain.negativeEffects.length > 0 && (
+                  <div>
+                    <span className="text-text-tertiary block mb-1">Watch Out For</span>
+                    <div className="flex flex-wrap gap-1">
+                      {strain.negativeEffects.map((e) => (
+                        <span key={e} className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400">{e}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div>
                   <span className="text-text-tertiary block mb-1">Flavors</span>
                   <div className="flex flex-wrap gap-1">
-                    {strain.top_flavors.map((f) => (
+                    {strain.flavors.map((f) => (
                       <span key={f} className="tag text-xs">{f}</span>
                     ))}
                   </div>
@@ -140,26 +232,49 @@ export default function StrainCompare() {
                   <span className="text-text-tertiary block mb-1">Terpenes</span>
                   <div className="flex flex-wrap gap-1">
                     {strain.terpenes.map((t) => (
-                      <span key={t} className="tag text-xs">{t}</span>
+                      <span key={t} className="text-xs px-2 py-0.5 rounded-full border border-accent-green/20 bg-accent-green/5 text-accent-green font-mono">{t}</span>
                     ))}
                   </div>
                 </div>
                 <div className="pt-2 border-t border-border">
                   <span className="text-text-tertiary text-xs">Best for</span>
-                  <p className="font-body font-medium">{strain.best_for}</p>
+                  <p className="font-body font-medium">{strain.bestFor}</p>
                 </div>
+              </div>
+              {/* Affiliate Links */}
+              <div className="mt-4 pt-3 border-t border-border flex flex-wrap gap-3">
+                <a
+                  href={`https://www.leafly.com/search?q=${encodeURIComponent(strain.name)}`}
+                  target="_blank"
+                  rel="nofollow sponsored noopener"
+                  className="text-xs text-accent-green hover:text-accent-green-light transition-colors"
+                >
+                  Find on Leafly &rarr;
+                </a>
+                <a
+                  href={`https://weedmaps.com/search?q=${encodeURIComponent(strain.name)}`}
+                  target="_blank"
+                  rel="nofollow sponsored noopener"
+                  className="text-xs text-text-secondary hover:text-accent-green transition-colors"
+                >
+                  Find on Weedmaps &rarr;
+                </a>
               </div>
             </div>
           ))}
         </div>
 
-        {/* AI Summary */}
+        {/* AI Comparison */}
         <div className="tool-container">
-          <h3 className="font-heading text-xl mb-4">AI Verdict</h3>
+          <h3 className="font-heading text-xl mb-4">AI Comparison</h3>
           <div className="prose prose-sm max-w-none text-text-secondary">
-            {result.summary.split("\n").map((paragraph, i) => (
+            {result.comparison.split("\n").map((paragraph, i) => (
               <p key={i} className="mb-3 leading-relaxed">{paragraph}</p>
             ))}
+          </div>
+          <div className="mt-4 p-4 rounded-lg bg-accent-green/5 border border-accent-green/20">
+            <p className="font-heading text-sm font-semibold text-accent-green mb-1">Verdict</p>
+            <p className="text-text-primary text-sm">{result.verdict}</p>
           </div>
         </div>
 
@@ -172,52 +287,22 @@ export default function StrainCompare() {
 
   return (
     <div className="tool-container space-y-8">
+      <p className="text-text-secondary text-center">
+        Type any two strain names to get an AI-powered side-by-side comparison with detailed profiles and a verdict.
+      </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Strain 1 */}
-        <div>
-          <label className="block font-heading text-lg mb-3">Strain 1</label>
-          <input
-            type="text"
-            value={strain1}
-            onChange={(e) => setStrain1(e.target.value)}
-            placeholder="Type a strain name..."
-            className="w-full p-4 rounded-xl border-2 border-border bg-surface text-text-primary font-body focus:border-accent-green focus:outline-none transition-colors"
-          />
-          <div className="mt-3 flex flex-wrap gap-2">
-            {popularStrains.slice(0, 5).map((s) => (
-              <button
-                key={s}
-                onClick={() => setStrain1(s)}
-                className="tag text-xs cursor-pointer hover:bg-accent-green/10 transition-colors"
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Strain 2 */}
-        <div>
-          <label className="block font-heading text-lg mb-3">Strain 2</label>
-          <input
-            type="text"
-            value={strain2}
-            onChange={(e) => setStrain2(e.target.value)}
-            placeholder="Type a strain name..."
-            className="w-full p-4 rounded-xl border-2 border-border bg-surface text-text-primary font-body focus:border-accent-green focus:outline-none transition-colors"
-          />
-          <div className="mt-3 flex flex-wrap gap-2">
-            {popularStrains.slice(5, 10).map((s) => (
-              <button
-                key={s}
-                onClick={() => setStrain2(s)}
-                className="tag text-xs cursor-pointer hover:bg-accent-green/10 transition-colors"
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
+        <AutocompleteInput
+          value={strain1}
+          onChange={setStrain1}
+          placeholder="Type a strain name..."
+          label="Strain 1"
+        />
+        <AutocompleteInput
+          value={strain2}
+          onChange={setStrain2}
+          placeholder="Type a strain name..."
+          label="Strain 2"
+        />
       </div>
 
       <div className="text-center pt-4">

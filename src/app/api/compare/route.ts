@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = `You are a cannabis strain comparison expert. Compare these two strains in detail.
+    const prompt = `Compare these two cannabis strains in detail. Return structured JSON.
 
 Strain 1: ${typeof strain1 === "string" ? strain1 : JSON.stringify(strain1)}
 Strain 2: ${typeof strain2 === "string" ? strain2 : JSON.stringify(strain2)}
@@ -33,29 +33,34 @@ Return ONLY valid JSON with no additional text:
   "strain1": {
     "name": "string",
     "type": "Indica | Sativa | Hybrid",
+    "ratio": "string (e.g. '70% Indica / 30% Sativa')",
     "thc_range": "string (e.g. '18-22%')",
     "cbd_range": "string (e.g. '<1%')",
-    "top_effects": ["string", "string", "string"],
-    "top_flavors": ["string", "string", "string"],
-    "best_for": "string (one-line use case)",
-    "terpenes": ["string", "string"]
+    "terpenes": ["string", "string", "string"],
+    "effects": ["string", "string", "string", "string"],
+    "negativeEffects": ["string", "string"],
+    "flavors": ["string", "string", "string"],
+    "bestFor": "string"
   },
   "strain2": {
     "name": "string",
     "type": "Indica | Sativa | Hybrid",
-    "thc_range": "string (e.g. '20-25%')",
-    "cbd_range": "string (e.g. '<1%')",
-    "top_effects": ["string", "string", "string"],
-    "top_flavors": ["string", "string", "string"],
-    "best_for": "string (one-line use case)",
-    "terpenes": ["string", "string"]
+    "ratio": "string",
+    "thc_range": "string",
+    "cbd_range": "string",
+    "terpenes": ["string", "string", "string"],
+    "effects": ["string", "string", "string", "string"],
+    "negativeEffects": ["string", "string"],
+    "flavors": ["string", "string", "string"],
+    "bestFor": "string"
   },
-  "summary": "string (2-3 paragraph comparison covering key differences, who each is best for, and a clear verdict for common use cases)"
+  "comparison": "string (2-3 paragraph comparison explaining who each strain is best for, key differences, and clear recommendations by use case)",
+  "verdict": "string (one sentence: which to pick if you had to choose one)"
 }`;
 
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 1500,
+      max_tokens: 2000,
       messages: [{ role: "user", content: prompt }],
     });
 
