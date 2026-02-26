@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Logo from "@/components/ui/Logo";
 
 interface NavLink {
   label: string;
@@ -22,10 +23,8 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full bg-surface border-b border-border">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <span className="font-heading text-2xl font-semibold text-text-primary tracking-tight">
-            KushSavvy
-          </span>
+        <Link href="/" className="flex items-center">
+          <Logo size="md" variant="dark" />
         </Link>
 
         {/* Desktop Navigation */}
