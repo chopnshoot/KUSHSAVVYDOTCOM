@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  color: #1A1A1A;
+  background: #FAFAF8;
+}
+
+@layer components {
+  .card {
+    @apply bg-surface border border-border rounded-card transition-shadow duration-200 hover:shadow-md;
+  }
+
+  .btn-primary {
+    @apply bg-accent-green text-white px-6 py-3 rounded-lg font-body font-medium transition-colors duration-200 hover:bg-accent-green-light;
+  }
+
+  .btn-secondary {
+    @apply border border-accent-green text-accent-green px-6 py-3 rounded-lg font-body font-medium transition-colors duration-200 hover:bg-accent-green hover:text-white;
+  }
+
+  .btn-warm {
+    @apply bg-warm text-white px-6 py-3 rounded-lg font-body font-medium transition-colors duration-200 hover:opacity-90;
+  }
+
+  .tag {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-body bg-tag-bg text-text-secondary;
+  }
+
+  .tag-indica {
+    @apply bg-indica/10 text-indica;
+  }
+
+  .tag-sativa {
+    @apply bg-sativa/10 text-sativa;
+  }
+
+  .tag-hybrid {
+    @apply bg-hybrid/10 text-hybrid;
+  }
+
+  .tool-container {
+    @apply bg-tool-bg rounded-2xl p-6 md:p-8;
+  }
+
+  .section-heading {
+    @apply font-heading text-3xl md:text-4xl text-text-primary;
+  }
+
+  .result-card-indica {
+    @apply border-l-4 border-l-indica;
+  }
+
+  .result-card-sativa {
+    @apply border-l-4 border-l-sativa;
+  }
+
+  .result-card-hybrid {
+    @apply border-l-4 border-l-hybrid;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
