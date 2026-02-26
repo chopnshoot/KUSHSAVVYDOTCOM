@@ -1,0 +1,138 @@
+export interface SeedTerpene {
+  name: string;
+  aroma: string;
+  effects: string[];
+  alsoFoundIn: string[];
+  description: string;
+  researchSummary: string;
+  color: string;
+}
+
+export const seedTerpenes: SeedTerpene[] = [
+  {
+    name: "Myrcene",
+    aroma: "Earthy, musky, herbal with hints of fruit",
+    effects: ["Relaxation", "Sedation", "Pain relief", "Anti-inflammatory"],
+    alsoFoundIn: ["Mangoes", "Lemongrass", "Hops", "Thyme"],
+    description: "Myrcene is the most abundant terpene in modern cannabis and is responsible for the sedating 'couch-lock' effect of many indica strains. It enhances THC absorption and contributes to the overall relaxing experience.",
+    researchSummary: "Studies suggest myrcene has analgesic, anti-inflammatory, and sedative properties. It may enhance the effects of THC by increasing cell membrane permeability.",
+    color: "#4CAF50",
+  },
+  {
+    name: "Limonene",
+    aroma: "Citrus, lemon, orange",
+    effects: ["Mood elevation", "Stress relief", "Anti-anxiety", "Energizing"],
+    alsoFoundIn: ["Lemons", "Oranges", "Juniper", "Peppermint"],
+    description: "Limonene is responsible for the bright citrus aroma found in many uplifting cannabis strains. It is the second most common terpene in nature and is known for its mood-enhancing and stress-relieving properties.",
+    researchSummary: "Research indicates limonene has anti-anxiety, antidepressant, and anti-inflammatory effects. It may also have gastroprotective and anticancer properties.",
+    color: "#FF9800",
+  },
+  {
+    name: "Caryophyllene",
+    aroma: "Spicy, peppery, woody",
+    effects: ["Anti-inflammatory", "Pain relief", "Anti-anxiety", "Gastroprotective"],
+    alsoFoundIn: ["Black pepper", "Cloves", "Cinnamon", "Basil"],
+    description: "Caryophyllene is unique among terpenes because it also acts as a cannabinoid, binding to CB2 receptors in the endocannabinoid system. This gives it potent anti-inflammatory and pain-relieving properties beyond other terpenes.",
+    researchSummary: "Caryophyllene is the only terpene known to interact with the endocannabinoid system. Studies show it has anti-inflammatory, analgesic, and neuroprotective effects.",
+    color: "#795548",
+  },
+  {
+    name: "Pinene",
+    aroma: "Pine, fresh, woodsy",
+    effects: ["Alertness", "Memory retention", "Anti-inflammatory", "Bronchodilator"],
+    alsoFoundIn: ["Pine needles", "Rosemary", "Basil", "Dill"],
+    description: "Pinene is the most common terpene in the natural world and is responsible for the fresh pine scent in many cannabis strains. It may help counteract some of the short-term memory impairment associated with THC.",
+    researchSummary: "Research suggests pinene has anti-inflammatory, bronchodilator, and memory-enhancing properties. It may counteract THC-induced short-term memory loss.",
+    color: "#2E7D32",
+  },
+  {
+    name: "Linalool",
+    aroma: "Floral, lavender, sweet",
+    effects: ["Relaxation", "Anti-anxiety", "Sedation", "Pain relief"],
+    alsoFoundIn: ["Lavender", "Coriander", "Cinnamon", "Birch bark"],
+    description: "Linalool produces the calming, floral aroma associated with lavender. In cannabis, it contributes to the relaxing and anti-anxiety effects of many indica and hybrid strains. It has been used in traditional medicine for centuries.",
+    researchSummary: "Studies demonstrate linalool's anxiolytic, sedative, and analgesic properties. It has shown promise in reducing stress and improving sleep quality.",
+    color: "#9C27B0",
+  },
+  {
+    name: "Humulene",
+    aroma: "Earthy, woody, hoppy",
+    effects: ["Appetite suppression", "Anti-inflammatory", "Antibacterial", "Pain relief"],
+    alsoFoundIn: ["Hops", "Coriander", "Ginseng", "Sage"],
+    description: "Humulene is found in hops and gives beer its distinct earthy aroma. Unlike many cannabis terpenes, humulene acts as an appetite suppressant, making it notable among strains that do not induce the munchies.",
+    researchSummary: "Research shows humulene has anti-inflammatory, antibacterial, and appetite-suppressant properties. It works synergistically with caryophyllene for enhanced effects.",
+    color: "#827717",
+  },
+  {
+    name: "Terpinolene",
+    aroma: "Floral, herbal, piney with citrus",
+    effects: ["Uplifting", "Sedation (in large amounts)", "Antioxidant", "Antibacterial"],
+    alsoFoundIn: ["Nutmeg", "Tea tree", "Cumin", "Apples"],
+    description: "Terpinolene is a versatile terpene found in a small percentage of cannabis strains. It delivers a complex aroma that blends floral, herbal, and citrus notes. Strains dominant in terpinolene tend to produce uplifting, creative effects.",
+    researchSummary: "Research indicates terpinolene has antioxidant, anticancer, and sedative properties. It is the least common dominant terpene in cannabis but appears in many popular sativas.",
+    color: "#00BCD4",
+  },
+  {
+    name: "Ocimene",
+    aroma: "Sweet, herbal, woody",
+    effects: ["Anti-inflammatory", "Antiviral", "Antifungal", "Decongestant"],
+    alsoFoundIn: ["Mint", "Parsley", "Orchids", "Kumquats"],
+    description: "Ocimene is a terpene often found in sativa-dominant strains, contributing sweet, herbaceous aromas. While less common as a dominant terpene, it plays an important role in the entourage effect and has shown promising therapeutic properties.",
+    researchSummary: "Studies suggest ocimene has anti-inflammatory, antiviral, and antifungal properties. It is commonly used in perfumery and appears to act as a natural decongestant.",
+    color: "#8BC34A",
+  },
+  {
+    name: "Bisabolol",
+    aroma: "Floral, sweet, chamomile-like",
+    effects: ["Anti-inflammatory", "Skin healing", "Anti-irritant", "Analgesic"],
+    alsoFoundIn: ["Chamomile", "Candeia tree"],
+    description: "Bisabolol is a gentle terpene best known for its presence in chamomile. In cannabis, it contributes a delicate floral sweetness and is prized for its skin-soothing and anti-inflammatory benefits.",
+    researchSummary: "Research shows bisabolol has anti-inflammatory, analgesic, and antimicrobial properties. It is widely used in cosmetics for its skin-healing benefits.",
+    color: "#E91E63",
+  },
+  {
+    name: "Geraniol",
+    aroma: "Rose, citrus, sweet floral",
+    effects: ["Antioxidant", "Neuroprotective", "Anti-inflammatory", "Antifungal"],
+    alsoFoundIn: ["Roses", "Geraniums", "Lemons", "Tobacco"],
+    description: "Geraniol produces a sweet, rose-like aroma and is commonly found in geraniums and roses. In cannabis, it contributes to sweet, floral flavor profiles and has shown promising neuroprotective and antioxidant properties.",
+    researchSummary: "Studies indicate geraniol has neuroprotective, antioxidant, and anticancer properties. It is commonly used in aromatherapy for its calming effects.",
+    color: "#F44336",
+  },
+  {
+    name: "Camphene",
+    aroma: "Herbal, damp woodlands, fir needles",
+    effects: ["Antioxidant", "Anti-inflammatory", "Pain relief", "Cardiovascular support"],
+    alsoFoundIn: ["Camphor", "Ginger", "Rosemary", "Valerian"],
+    description: "Camphene has an herbal, earthy scent reminiscent of damp forests. While less prominent in cannabis than other terpenes, it plays a role in the entourage effect and has shown potential cardiovascular benefits.",
+    researchSummary: "Research suggests camphene may help reduce cholesterol and triglyceride levels. It also shows promise as an antioxidant and anti-inflammatory agent.",
+    color: "#607D8B",
+  },
+  {
+    name: "Valencene",
+    aroma: "Sweet citrus, orange, grapefruit",
+    effects: ["Anti-inflammatory", "Insect repellent", "Skin protection", "Alertness"],
+    alsoFoundIn: ["Valencia oranges", "Grapefruits", "Tangerines"],
+    description: "Valencene is named after Valencia oranges and delivers a bright, sweet citrus aroma. It is relatively rare as a dominant terpene in cannabis but contributes to the refreshing citrus profiles of several popular strains.",
+    researchSummary: "Studies show valencene has anti-inflammatory and anti-allergic properties. It is also an effective natural insect repellent.",
+    color: "#FF5722",
+  },
+  {
+    name: "Nerolidol",
+    aroma: "Woody, floral, fresh bark",
+    effects: ["Sedation", "Antifungal", "Antiparasitic", "Anti-anxiety"],
+    alsoFoundIn: ["Jasmine", "Tea tree", "Lemongrass", "Ginger"],
+    description: "Nerolidol is a secondary terpene that delivers a complex woody and floral aroma. Its sedating properties enhance the relaxing effects of indica-dominant strains, and it has shown promising antifungal and antiparasitic activity.",
+    researchSummary: "Research indicates nerolidol has sedative, antifungal, antiparasitic, and skin-penetration enhancing properties, making it useful in transdermal cannabis applications.",
+    color: "#3F51B5",
+  },
+  {
+    name: "Guaiol",
+    aroma: "Piney, woody, rose",
+    effects: ["Anti-inflammatory", "Antimicrobial", "Insect repellent", "Antioxidant"],
+    alsoFoundIn: ["Guaiacum tree", "Cypress pine"],
+    description: "Guaiol is unique among terpenes as it is a sesquiterpenoid alcohol, giving it a liquid form at room temperature. It contributes piney, woody aromas to cannabis and has a long history of traditional medicinal use.",
+    researchSummary: "Studies suggest guaiol has anti-inflammatory, antimicrobial, and antiparasitic properties. Historically, guaiacum was used to treat conditions from arthritis to syphilis.",
+    color: "#009688",
+  },
+];
