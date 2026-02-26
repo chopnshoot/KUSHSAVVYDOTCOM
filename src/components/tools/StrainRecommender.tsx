@@ -101,14 +101,14 @@ export default function StrainRecommender() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(answers),
       });
-      if (!response.ok) {
-        throw new Error("Failed to get recommendations");
-      }
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to get recommendations");
+      }
       setResults(data.recommendations);
-    } catch {
+    } catch (err) {
       setError(
-        "Failed to generate recommendations. Please try again."
+        err instanceof Error ? err.message : "Failed to generate recommendations. Please try again."
       );
     } finally {
       setLoading(false);
