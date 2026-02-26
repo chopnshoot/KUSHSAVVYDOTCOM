@@ -23,14 +23,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const toList = (v: unknown): string =>
+      Array.isArray(v) ? v.join(", ") : typeof v === "string" ? v : "";
+
     const prompt = `You are KushSavvy's strain recommendation engine. Based on the user's preferences, recommend exactly 3 cannabis strains. Use only well-known, widely available strains.
 
 User preferences:
-- Desired effects: ${effects.join(", ")}
+- Desired effects: ${toList(effects)}
 - Experience level: ${experience}
 - Consumption method: ${method}
-- Effects to avoid: ${avoid?.join(", ") || "None specified"}
-- Flavor preference: ${flavor?.join(", ") || "No preference"}
+- Effects to avoid: ${toList(avoid) || "None specified"}
+- Flavor preference: ${toList(flavor) || "No preference"}
 
 Return ONLY valid JSON with no additional text:
 {

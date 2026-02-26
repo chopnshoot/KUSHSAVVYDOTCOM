@@ -75,7 +75,18 @@ export default function StrainRecommender() {
 
   const handleSelect = (value: string | string[]) => {
     const step = quizSteps[currentStep];
-    setAnswers((prev) => ({ ...prev, [step.key]: value }));
+    if (step.multiSelect) {
+      const clicked = value as string;
+      setAnswers((prev) => {
+        const current = (prev[step.key] as string[]) || [];
+        if (current.includes(clicked)) {
+          return { ...prev, [step.key]: current.filter((v) => v !== clicked) };
+        }
+        return { ...prev, [step.key]: [...current, clicked] };
+      });
+    } else {
+      setAnswers((prev) => ({ ...prev, [step.key]: value }));
+    }
   };
 
   const handleNext = async () => {
