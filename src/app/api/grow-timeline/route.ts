@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "",
-});
-
 export async function POST(request: NextRequest) {
   try {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      console.error("ANTHROPIC_API_KEY is not set");
+      return NextResponse.json(
+        { error: "Service configuration error. Please contact support." },
+        { status: 503 }
+      );
+    }
+
+    const anthropic = new Anthropic({ apiKey });
+
     const { strain_type, grow_method, experience, environment } =
       await request.json();
 
@@ -63,9 +70,10 @@ Return ONLY valid JSON with no additional text:
     const result = JSON.parse(jsonMatch[0]);
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Grow timeline error:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("Grow timeline error:", message);
     return NextResponse.json(
-      { error: "Failed to generate grow timeline. Please try again." },
+      { error: `Failed to generate grow timeline: ${message}` },
       { status: 500 }
     );
   }

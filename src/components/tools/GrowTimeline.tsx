@@ -74,11 +74,11 @@ export default function GrowTimeline() {
           environment,
         }),
       });
-      if (!response.ok) throw new Error("Failed to generate");
       const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to generate grow timeline");
       setResult(data);
-    } catch {
-      setError("Failed to generate grow timeline. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to generate grow timeline. Please try again.");
     } finally {
       setLoading(false);
     }

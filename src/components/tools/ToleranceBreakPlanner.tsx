@@ -69,11 +69,11 @@ export default function ToleranceBreakPlanner() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usage, frequency, duration, goal }),
       });
-      if (!response.ok) throw new Error("Failed to generate plan");
       const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to generate plan");
       setResult(data);
-    } catch {
-      setError("Failed to generate your plan. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to generate your plan. Please try again.");
     } finally {
       setLoading(false);
     }

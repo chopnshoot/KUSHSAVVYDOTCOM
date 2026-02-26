@@ -83,11 +83,11 @@ export default function CbdVsThc() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ goal, experience, concerns }),
       });
-      if (!response.ok) throw new Error("Failed");
       const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to generate recommendation");
       setResult(data);
-    } catch {
-      setError("Failed to generate recommendation. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to generate recommendation. Please try again.");
     } finally {
       setLoading(false);
     }
