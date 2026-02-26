@@ -60,8 +60,8 @@ export default function StrainCompare() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ strain1: strain1.trim(), strain2: strain2.trim() }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to compare");
+      const data = await response.json().catch(() => ({ error: `Server error (${response.status})` }));
+      if (!response.ok) throw new Error(data.error || `Request failed with status ${response.status}`);
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to generate comparison. Please try again.");

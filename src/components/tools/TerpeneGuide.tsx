@@ -45,8 +45,8 @@ export default function TerpeneGuide() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ terpene: name }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to load terpene info");
+      const data = await response.json().catch(() => ({ error: `Server error (${response.status})` }));
+      if (!response.ok) throw new Error(data.error || `Request failed with status ${response.status}`);
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load terpene info. Please try again.");

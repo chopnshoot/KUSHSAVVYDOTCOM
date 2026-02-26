@@ -74,8 +74,8 @@ export default function GrowTimeline() {
           environment,
         }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to generate grow timeline");
+      const data = await response.json().catch(() => ({ error: `Server error (${response.status})` }));
+      if (!response.ok) throw new Error(data.error || `Request failed with status ${response.status}`);
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to generate grow timeline. Please try again.");
