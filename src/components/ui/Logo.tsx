@@ -1,24 +1,27 @@
+import Image from "next/image";
+
 interface LogoProps {
   className?: string;
-  variant?: "dark" | "light";
   size?: "sm" | "md" | "lg";
 }
 
-const sizeClasses = {
-  sm: "text-base tracking-widest",
-  md: "text-xl tracking-widest",
-  lg: "text-2xl tracking-widest",
+const sizeMap = {
+  sm: { width: 100, height: 40 },
+  md: { width: 140, height: 56 },
+  lg: { width: 180, height: 72 },
 };
 
-export default function Logo({ className, variant = "dark", size = "md" }: LogoProps) {
-  const colorClass = variant === "dark" ? "text-accent-green" : "text-white";
+export default function Logo({ className, size = "md" }: LogoProps) {
+  const { width, height } = sizeMap[size];
 
   return (
-    <span
-      className={`inline-block whitespace-nowrap font-heading font-bold ${sizeClasses[size]} ${colorClass} ${className || ""}`}
-      aria-label="KushSavvy"
-    >
-      KUSH SAVVY
-    </span>
+    <Image
+      src="/kushsavvy-trans-logo-white.png"
+      alt="KushSavvy"
+      width={width}
+      height={height}
+      className={className}
+      priority
+    />
   );
 }
