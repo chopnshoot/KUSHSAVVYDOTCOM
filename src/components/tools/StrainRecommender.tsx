@@ -6,6 +6,7 @@ import StrainResultCard from "@/components/ui/StrainResultCard";
 import TurnstileWidget from "@/components/ui/TurnstileWidget";
 import RateLimitPrompt from "@/components/ui/RateLimitPrompt";
 import UsageCounter from "@/components/ui/UsageCounter";
+import ShareBar from "@/components/ShareBar";
 import { StrainRecommendation } from "@/lib/types";
 
 const quizSteps = [
@@ -78,6 +79,7 @@ export default function StrainRecommender() {
   const [rateLimited, setRateLimited] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   const handleTurnstileVerify = useCallback((token: string) => {
     setTurnstileToken(token);
@@ -139,6 +141,12 @@ export default function StrainRecommender() {
 
       setResults(data.recommendations);
 
+      // Update URL to shareable link
+      if (data.shareUrl) {
+        setShareUrl(data.shareUrl);
+        window.history.pushState({ tool: "strain-recommender", hash: data.shareHash }, "", data.shareUrl);
+      }
+
       // Update usage counter from response
       if (data._rateLimit) {
         setUsage({
@@ -171,14 +179,29 @@ export default function StrainRecommender() {
 
   if (loading) {
     return (
-      <div className="tool-container text-center py-16">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-green mx-auto mb-4"></div>
-        <p className="text-text-secondary text-lg">
-          Analyzing your preferences and finding your perfect strains...
-        </p>
-        <p className="text-text-tertiary text-sm mt-2">
-          This usually takes 5-10 seconds
-        </p>
+      <div className="space-y-6">
+        <div className="text-center mb-8">
+          <h2 className="font-heading text-2xl md:text-3xl mb-2">Finding Your Perfect Strains...</h2>
+          <p className="text-text-secondary">This usually takes 5-10 seconds</p>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="animate-pulse rounded-card border border-border bg-surface p-6">
+              <div className="h-6 bg-tag-bg rounded w-2/3 mb-3" />
+              <div className="h-4 bg-tag-bg rounded w-1/3 mb-4" />
+              <div className="space-y-2">
+                <div className="h-4 bg-tag-bg rounded w-full" />
+                <div className="h-4 bg-tag-bg rounded w-5/6" />
+                <div className="h-4 bg-tag-bg rounded w-4/6" />
+              </div>
+              <div className="flex gap-2 mt-4">
+                <div className="h-6 bg-tag-bg rounded-full w-16" />
+                <div className="h-6 bg-tag-bg rounded-full w-20" />
+                <div className="h-6 bg-tag-bg rounded-full w-14" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -209,6 +232,12 @@ export default function StrainRecommender() {
             Try Again with Different Preferences
           </button>
         </div>
+        {shareUrl && (
+          <ShareBar
+            url={shareUrl}
+            text="Just got my personalized strain recommendations from KushSavvy!"
+          />
+        )}
         {usage && <UsageCounter used={usage.used} limit={usage.limit} />}
       </div>
     );

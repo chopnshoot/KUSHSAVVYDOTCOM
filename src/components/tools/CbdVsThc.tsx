@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ShareBar from "@/components/ShareBar";
 
 interface CannabinoidBreakdown {
   relevance: string;
@@ -59,6 +60,7 @@ export default function CbdVsThc() {
   const [result, setResult] = useState<CbdThcResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   const toggleConcern = (value: string) => {
     if (value === "none") {
@@ -86,6 +88,10 @@ export default function CbdVsThc() {
       const data = await response.json().catch(() => ({ error: `Server error (${response.status})` }));
       if (!response.ok) throw new Error(data.error || `Request failed with status ${response.status}`);
       setResult(data);
+      if (data.shareUrl) {
+        setShareUrl(data.shareUrl);
+        window.history.pushState({ tool: "cbd-vs-thc", hash: data.shareHash }, "", data.shareUrl);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to generate recommendation. Please try again.");
     } finally {
@@ -197,6 +203,9 @@ export default function CbdVsThc() {
         <div className="text-center">
           <button onClick={handleReset} className="btn-secondary">Try Different Options</button>
         </div>
+        {shareUrl && (
+          <ShareBar url={shareUrl} text="Found out whether CBD or THC is right for me on KushSavvy!" />
+        )}
       </div>
     );
   }

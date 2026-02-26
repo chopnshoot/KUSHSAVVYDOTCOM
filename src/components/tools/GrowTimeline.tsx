@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ShareBar from "@/components/ShareBar";
 
 interface GrowPhase {
   name: string;
@@ -56,6 +57,7 @@ export default function GrowTimeline() {
   const [result, setResult] = useState<GrowPlan | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   const canSubmit = strainType && growMethod && environment;
 
@@ -77,6 +79,10 @@ export default function GrowTimeline() {
       const data = await response.json().catch(() => ({ error: `Server error (${response.status})` }));
       if (!response.ok) throw new Error(data.error || `Request failed with status ${response.status}`);
       setResult(data);
+      if (data.shareUrl) {
+        setShareUrl(data.shareUrl);
+        window.history.pushState({ tool: "grow-timeline", hash: data.shareHash }, "", data.shareUrl);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to generate grow timeline. Please try again.");
     } finally {
@@ -188,6 +194,9 @@ export default function GrowTimeline() {
         <div className="text-center">
           <button onClick={handleReset} className="btn-secondary">Plan a Different Grow</button>
         </div>
+        {shareUrl && (
+          <ShareBar url={shareUrl} text="Planning my cannabis grow with KushSavvy!" />
+        )}
       </div>
     );
   }

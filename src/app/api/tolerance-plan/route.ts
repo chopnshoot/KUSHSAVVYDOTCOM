@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { storeResult } from "@/lib/results";
+import { generateTolerancePlanMeta } from "@/lib/result-meta";
 
 export async function POST(request: NextRequest) {
   try {
@@ -65,7 +67,21 @@ Return ONLY valid JSON with no additional text:
     }
 
     const result = JSON.parse(jsonMatch[0]);
-    return NextResponse.json(result);
+
+    const parsedInput = { usage, frequency, duration, goal };
+    const meta = generateTolerancePlanMeta(parsedInput, result);
+    const shareHash = await storeResult({
+      tool: "tolerance-break-planner",
+      input: parsedInput,
+      output: JSON.stringify(result),
+      meta,
+    });
+
+    return NextResponse.json({
+      ...result,
+      shareHash,
+      shareUrl: shareHash ? `/tools/tolerance-break-planner/r/${shareHash}` : undefined,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("Tolerance plan error:", message);

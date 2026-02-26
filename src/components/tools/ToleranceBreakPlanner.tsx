@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ShareBar from "@/components/ShareBar";
 
 interface Phase {
   day: string;
@@ -56,6 +57,7 @@ export default function ToleranceBreakPlanner() {
   const [result, setResult] = useState<TolerancePlan | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   const canSubmit = usage && frequency && duration;
 
@@ -72,6 +74,10 @@ export default function ToleranceBreakPlanner() {
       const data = await response.json().catch(() => ({ error: `Server error (${response.status})` }));
       if (!response.ok) throw new Error(data.error || `Request failed with status ${response.status}`);
       setResult(data);
+      if (data.shareUrl) {
+        setShareUrl(data.shareUrl);
+        window.history.pushState({ tool: "tolerance-break-planner", hash: data.shareHash }, "", data.shareUrl);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to generate your plan. Please try again.");
     } finally {
@@ -167,6 +173,9 @@ export default function ToleranceBreakPlanner() {
         <div className="text-center">
           <button onClick={handleReset} className="btn-secondary">Plan a Different Break</button>
         </div>
+        {shareUrl && (
+          <ShareBar url={shareUrl} text="Just got my custom tolerance break plan from KushSavvy!" />
+        )}
       </div>
     );
   }

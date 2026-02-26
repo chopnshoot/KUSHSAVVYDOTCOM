@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export const metadata: Metadata = {
   title: "About KushSavvy",
@@ -14,6 +15,7 @@ export default function AboutPage() {
     <>
       <Header />
       <main className="max-w-3xl mx-auto px-4 py-12 md:py-20">
+        <Breadcrumbs items={[{ label: "About" }]} />
         <h1 className="font-heading text-3xl md:text-5xl mb-6">About KushSavvy</h1>
 
         <div className="space-y-6 text-text-secondary leading-relaxed">
@@ -68,6 +70,15 @@ export default function AboutPage() {
             platform.
           </p>
 
+          <h2 className="font-heading text-2xl text-text-primary mt-10">Why Trust KushSavvy?</h2>
+          <p>
+            Our content is written and reviewed by cannabis educators with years of
+            experience in the industry. We cite scientific research where available,
+            link to official state regulatory sources for legal information, and use
+            AI models trained on verified strain data. We never accept payment for
+            strain recommendations and have no affiliation with any dispensary or brand.
+          </p>
+
           <h2 className="font-heading text-2xl text-text-primary mt-10">Important Disclaimer</h2>
           <p>
             KushSavvy is an educational resource and does not sell cannabis products.
@@ -77,6 +88,25 @@ export default function AboutPage() {
             comply with your local laws and regulations.
           </p>
         </div>
+
+        {/* Person Schema for author authority */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: "Langston",
+              url: "https://kushsavvy.com/about",
+              jobTitle: "Founder, KushSavvy",
+              description:
+                "Cannabis educator and media professional focused on making cannabis information accessible, accurate, and actionable.",
+              sameAs: [
+                "https://twitter.com/kushsavvy",
+              ],
+            }),
+          }}
+        />
       </main>
       <Footer />
     </>
