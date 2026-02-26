@@ -5,9 +5,9 @@ interface LogoProps {
 }
 
 const sizeClasses = {
-  sm: "text-lg tracking-[0.25em]",
-  md: "text-2xl tracking-[0.3em]",
-  lg: "text-3xl tracking-[0.35em]",
+  sm: "text-base tracking-widest",
+  md: "text-xl tracking-widest",
+  lg: "text-2xl tracking-widest",
 };
 
 export default function Logo({ className, variant = "dark", size = "md" }: LogoProps) {
@@ -15,7 +15,7 @@ export default function Logo({ className, variant = "dark", size = "md" }: LogoP
 
   return (
     <span
-      className={`font-heading font-bold ${sizeClasses[size]} ${colorClass} ${className || ""}`}
+      className={`inline-block whitespace-nowrap font-heading font-bold ${sizeClasses[size]} ${colorClass} ${className || ""}`}
       aria-label="KushSavvy"
     >
       KUSH SAVVY
