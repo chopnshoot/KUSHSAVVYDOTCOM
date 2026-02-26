@@ -16,22 +16,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = `Compare these two cannabis strains for a user trying to decide between them. Be concise, practical, and conversational. 2-3 paragraphs max.
+    const prompt = `You are a cannabis strain comparison expert. Compare these two strains in detail.
 
-Strain 1: ${JSON.stringify(strain1)}
-Strain 2: ${JSON.stringify(strain2)}
+Strain 1: ${typeof strain1 === "string" ? strain1 : JSON.stringify(strain1)}
+Strain 2: ${typeof strain2 === "string" ? strain2 : JSON.stringify(strain2)}
 
-Cover: Who each strain is best for, the key differences in experience, and a clear recommendation for common use cases (relaxation, creativity, pain, sleep, social).`;
+Return ONLY valid JSON with no additional text:
+{
+  "strain1": {
+    "name": "string",
+    "type": "Indica | Sativa | Hybrid",
+    "thc_range": "string (e.g. '18-22%')",
+    "cbd_range": "string (e.g. '<1%')",
+    "top_effects": ["string", "string", "string"],
+    "top_flavors": ["string", "string", "string"],
+    "best_for": "string (one-line use case)",
+    "terpenes": ["string", "string"]
+  },
+  "strain2": {
+    "name": "string",
+    "type": "Indica | Sativa | Hybrid",
+    "thc_range": "string (e.g. '20-25%')",
+    "cbd_range": "string (e.g. '<1%')",
+    "top_effects": ["string", "string", "string"],
+    "top_flavors": ["string", "string", "string"],
+    "best_for": "string (one-line use case)",
+    "terpenes": ["string", "string"]
+  },
+  "summary": "string (2-3 paragraph comparison covering key differences, who each is best for, and a clear verdict for common use cases)"
+}`;
 
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 800,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+      max_tokens: 1500,
+      messages: [{ role: "user", content: prompt }],
     });
 
     const textContent = message.content.find((c) => c.type === "text");
@@ -39,7 +57,13 @@ Cover: Who each strain is best for, the key differences in experience, and a cle
       throw new Error("No text response received");
     }
 
-    return NextResponse.json({ summary: textContent.text });
+    const jsonMatch = textContent.text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("Could not parse JSON from response");
+    }
+
+    const result = JSON.parse(jsonMatch[0]);
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Comparison error:", error);
     return NextResponse.json(

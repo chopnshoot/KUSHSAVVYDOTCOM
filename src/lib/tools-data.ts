@@ -30,7 +30,7 @@ export const tools: ToolInfo[] = [
     title: "Strain Comparison",
     description: "Compare two strains side-by-side to find your best match",
     icon: "⚔️",
-    available: false,
+    available: true,
   },
   {
     slug: "terpene-guide",
@@ -38,7 +38,7 @@ export const tools: ToolInfo[] = [
     description:
       "Interactive guide to cannabis terpenes and their effects",
     icon: "🧪",
-    available: false,
+    available: true,
   },
   {
     slug: "tolerance-break-planner",
@@ -46,14 +46,14 @@ export const tools: ToolInfo[] = [
     description:
       "Plan your tolerance break with a day-by-day guide",
     icon: "📅",
-    available: false,
+    available: true,
   },
   {
     slug: "cost-calculator",
     title: "Cost Calculator",
     description: "Calculate your cannabis spending and find ways to save",
     icon: "💰",
-    available: false,
+    available: true,
   },
   {
     slug: "grow-timeline",
@@ -61,14 +61,14 @@ export const tools: ToolInfo[] = [
     description:
       "Plan your cannabis grow with a visual timeline from seed to harvest",
     icon: "🌱",
-    available: false,
+    available: true,
   },
   {
     slug: "strain-journal",
     title: "Strain Journal",
     description: "Track and rate strains you have tried to get personalized recommendations",
     icon: "📓",
-    available: false,
+    available: true,
   },
   {
     slug: "cbd-vs-thc",
@@ -76,6 +76,6 @@ export const tools: ToolInfo[] = [
     description:
       "Learn which cannabinoid is right for your needs",
     icon: "💊",
-    available: false,
+    available: true,
   },
 ];
