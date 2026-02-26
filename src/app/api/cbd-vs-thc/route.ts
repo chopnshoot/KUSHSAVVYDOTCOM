@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 User info:
 - Primary goal: ${goal}
 - Cannabis experience: ${experience || "Not specified"}
-- Concerns: ${concerns?.join(", ") || "None specified"}
+- Concerns: ${Array.isArray(concerns) ? concerns.join(", ") : concerns || "None specified"}
 
 Return ONLY valid JSON with no additional text:
 {
