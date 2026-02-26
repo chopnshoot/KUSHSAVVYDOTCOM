@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { seedStateLaws } from "@/lib/seed-states";
+import { getAllStateLaws } from "@/lib/sanity";
 
 export const metadata: Metadata = {
   title: "Cannabis Laws by State — Is Marijuana Legal in Your State?",
@@ -21,12 +21,13 @@ function slugify(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }
 
-export default function LegalPage() {
+export default async function LegalPage() {
+  const stateLaws = await getAllStateLaws();
   const grouped = {
-    "Fully Legal": seedStateLaws.filter((s) => s.legalStatus === "Fully Legal"),
-    "Medical Only": seedStateLaws.filter((s) => s.legalStatus === "Medical Only"),
-    Decriminalized: seedStateLaws.filter((s) => s.legalStatus === "Decriminalized"),
-    Illegal: seedStateLaws.filter((s) => s.legalStatus === "Illegal"),
+    "Fully Legal": stateLaws.filter((s) => s.legalStatus === "Fully Legal"),
+    "Medical Only": stateLaws.filter((s) => s.legalStatus === "Medical Only"),
+    Decriminalized: stateLaws.filter((s) => s.legalStatus === "Decriminalized"),
+    Illegal: stateLaws.filter((s) => s.legalStatus === "Illegal"),
   };
 
   return (
