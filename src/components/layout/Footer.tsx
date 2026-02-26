@@ -82,7 +82,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="mt-12 border-t border-border pt-8 flex flex-col items-center gap-4">
-          <Logo size="sm" variant="dark" />
+          <Logo size="sm" />
           <p className="font-body text-sm text-text-secondary text-center">
             &copy; {currentYear} KushSavvy. All rights reserved. For
             educational purposes only. Not medical advice.

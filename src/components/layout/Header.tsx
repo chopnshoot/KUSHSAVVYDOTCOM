@@ -20,11 +20,11 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-surface border-b border-border">
+    <header className="sticky top-0 z-50 w-full bg-[#1A1A1A] border-b border-[#2A2A2A]">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center">
-          <Logo size="md" variant="dark" />
+          <Logo size="md" />
         </Link>
 
         {/* Desktop Navigation */}
@@ -33,7 +33,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="font-body text-sm font-medium text-text-secondary transition-colors hover:text-accent-green"
+              className="font-body text-sm font-medium text-gray-300 transition-colors hover:text-accent-green"
             >
               {link.label}
             </Link>
@@ -43,7 +43,7 @@ export default function Header() {
         {/* Mobile Menu Button */}
         <button
           type="button"
-          className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-text-secondary hover:text-text-primary hover:bg-tag-bg transition-colors"
+          className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-expanded={mobileMenuOpen}
           aria-controls="mobile-menu"
@@ -87,7 +87,7 @@ export default function Header() {
       {mobileMenuOpen && (
         <nav
           id="mobile-menu"
-          className="md:hidden border-t border-border bg-surface"
+          className="md:hidden border-t border-[#2A2A2A] bg-[#1A1A1A]"
           aria-label="Mobile navigation"
         >
           <div className="space-y-1 px-4 py-3">
@@ -95,7 +95,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="block rounded-md px-3 py-2 font-body text-base font-medium text-text-secondary hover:bg-tag-bg hover:text-accent-green transition-colors"
+                className="block rounded-md px-3 py-2 font-body text-base font-medium text-gray-300 hover:bg-white/10 hover:text-accent-green transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.label}
