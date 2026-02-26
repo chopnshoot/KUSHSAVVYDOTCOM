@@ -3,12 +3,13 @@ import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import NewsletterSignup from "@/components/ui/NewsletterSignup";
-import { seedArticles, slugifyArticle } from "@/lib/seed-articles";
+import { getArticles, getArticleBySlug, slugifyArticle } from "@/lib/sanity";
 import { tools } from "@/lib/tools-data";
 import { notFound } from "next/navigation";
 
 export async function generateStaticParams() {
-  return seedArticles.map((article) => ({
+  const articles = await getArticles(100);
+  return articles.map((article) => ({
     slug: slugifyArticle(article.title),
   }));
 }
@@ -18,9 +19,7 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const article = seedArticles.find(
-    (a) => slugifyArticle(a.title) === params.slug
-  );
+  const article = await getArticleBySlug(params.slug);
   if (!article) return { title: "Article Not Found" };
 
   return {
@@ -83,14 +82,12 @@ function formatContent(text: string) {
   return text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
 }
 
-export default function ArticlePage({
+export default async function ArticlePage({
   params,
 }: {
   params: { slug: string };
 }) {
-  const article = seedArticles.find(
-    (a) => slugifyArticle(a.title) === params.slug
-  );
+  const article = await getArticleBySlug(params.slug);
   if (!article) notFound();
 
   const elements = renderMarkdown(article.body);
@@ -101,7 +98,8 @@ export default function ArticlePage({
     .map((slug) => tools.find((t) => t.slug === slug))
     .filter(Boolean);
 
-  const otherArticles = seedArticles
+  const allArticles = await getArticles(100);
+  const otherArticles = allArticles
     .filter((a) => a.title !== article.title)
     .slice(0, 3);
 

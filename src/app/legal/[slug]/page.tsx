@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { seedStateLaws } from "@/lib/seed-states";
+import { getAllStateLaws, getStateLaw } from "@/lib/sanity";
 import { notFound } from "next/navigation";
 
 function slugify(name: string) {
@@ -10,7 +10,8 @@ function slugify(name: string) {
 }
 
 export async function generateStaticParams() {
-  return seedStateLaws.map((state) => ({
+  const stateLaws = await getAllStateLaws();
+  return stateLaws.map((state) => ({
     slug: slugify(state.state),
   }));
 }
@@ -20,7 +21,7 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const state = seedStateLaws.find((s) => slugify(s.state) === params.slug);
+  const state = await getStateLaw(params.slug);
   if (!state) return { title: "State Not Found" };
 
   return {
@@ -36,12 +37,12 @@ const statusColors: Record<string, string> = {
   Illegal: "bg-red-100 text-red-800 border-red-300",
 };
 
-export default function StateLegalPage({
+export default async function StateLegalPage({
   params,
 }: {
   params: { slug: string };
 }) {
-  const state = seedStateLaws.find((s) => slugify(s.state) === params.slug);
+  const state = await getStateLaw(params.slug);
   if (!state) notFound();
 
   return (

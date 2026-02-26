@@ -1,17 +1,17 @@
 import Link from "next/link";
 import { tools } from "@/lib/tools-data";
-import { seedArticles, slugifyArticle } from "@/lib/seed-articles";
+import { getArticles, slugifyArticle } from "@/lib/sanity";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ToolCard from "@/components/ui/ToolCard";
 import NewsletterSignup from "@/components/ui/NewsletterSignup";
 
-export default function HomePage() {
+export default async function HomePage() {
   const featuredTools = tools
     .filter((t) => t.available)
     .concat(tools.filter((t) => !t.available))
     .slice(0, 6);
-  const latestArticles = seedArticles.slice(0, 6);
+  const latestArticles = await getArticles(6);
 
   return (
     <>

@@ -1,10 +1,14 @@
 import { MetadataRoute } from "next";
-import { seedStateLaws } from "@/lib/seed-states";
-import { seedArticles, slugifyArticle } from "@/lib/seed-articles";
+import { getAllStateLaws, getArticles, slugifyArticle } from "@/lib/sanity";
 import { tools } from "@/lib/tools-data";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kushsavvy.com";
+
+  const [stateLaws, articles] = await Promise.all([
+    getAllStateLaws(),
+    getArticles(100),
+  ]);
 
   const staticPages = [
     { url: baseUrl, changeFrequency: "weekly" as const, priority: 1 },
@@ -25,13 +29,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     }));
 
-  const statePages = seedStateLaws.map((state) => ({
+  const statePages = stateLaws.map((state) => ({
     url: `${baseUrl}/legal/${state.state.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }));
 
-  const articlePages = seedArticles.map((article) => ({
+  const articlePages = articles.map((article) => ({
     url: `${baseUrl}/learn/${slugifyArticle(article.title)}`,
     changeFrequency: "monthly" as const,
     priority: 0.7,

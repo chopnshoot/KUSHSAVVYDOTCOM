@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { seedArticles, slugifyArticle } from "@/lib/seed-articles";
+import { getArticles, slugifyArticle } from "@/lib/sanity";
 
 export const metadata: Metadata = {
   title: "Learn About Cannabis — Guides, Science & Education",
@@ -10,7 +10,8 @@ export const metadata: Metadata = {
     "Educational cannabis articles covering strains, edibles, terpenes, legality, growing, and more. Science-backed guides for beginners and experienced users.",
 };
 
-export default function LearnPage() {
+export default async function LearnPage() {
+  const seedArticles = await getArticles(100);
   return (
     <>
       <Header />

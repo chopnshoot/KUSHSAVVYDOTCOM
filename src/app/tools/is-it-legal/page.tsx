@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import IsItLegal from "@/components/tools/IsItLegal";
-import { seedStateLaws } from "@/lib/seed-states";
+import { getAllStateLaws } from "@/lib/sanity";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -34,7 +34,8 @@ const faqs = [
   },
 ];
 
-export default function IsItLegalPage() {
+export default async function IsItLegalPage() {
+  const seedStateLaws = await getAllStateLaws();
   const states = seedStateLaws.map((s) => ({
     state: s.state,
     abbreviation: s.abbreviation,
