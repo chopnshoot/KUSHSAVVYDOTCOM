@@ -46,6 +46,10 @@ const statusBgColors: Record<string, string> = {
   "Illegal": "bg-red-500",
 };
 
+function slugify(name: string) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+
 type Tab = "us" | "international";
 
 export default function IsItLegal({
@@ -242,6 +246,15 @@ export default function IsItLegal({
                 </div>
               )}
 
+              <div className="text-center">
+                <Link
+                  href={`/legal/${slugify(selectedState.state)}`}
+                  className="text-accent-green hover:text-accent-green-light font-medium transition-colors inline-flex items-center gap-1"
+                >
+                  View full {selectedState.state} cannabis law details &rarr;
+                </Link>
+              </div>
+
               {selectedState.recreationalLegal && (
                 <div className="bg-accent-green/5 rounded-2xl p-6 text-center border border-accent-green/20">
                   <h3 className="font-heading text-xl mb-2">
@@ -342,6 +355,15 @@ export default function IsItLegal({
                   </p>
                 </div>
               )}
+
+              <div className="text-center">
+                <Link
+                  href={`/legal/${slugify(selectedCountry.country)}`}
+                  className="text-accent-green hover:text-accent-green-light font-medium transition-colors inline-flex items-center gap-1"
+                >
+                  View full {selectedCountry.country} cannabis law details &rarr;
+                </Link>
+              </div>
 
               {selectedCountry.recreational && (
                 <div className="bg-accent-green/5 rounded-2xl p-6 text-center border border-accent-green/20">

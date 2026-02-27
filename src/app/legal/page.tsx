@@ -155,9 +155,10 @@ export default async function LegalPage() {
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {list.map((c) => (
-                  <div
+                  <Link
                     key={c.code}
-                    className="card p-4 flex items-center justify-between"
+                    href={`/legal/${slugify(c.country)}`}
+                    className="card p-4 hover:shadow-md transition-shadow flex items-center justify-between"
                   >
                     <div>
                       <span className="font-semibold">{c.country}</span>
@@ -165,10 +166,10 @@ export default async function LegalPage() {
                         {c.code}
                       </span>
                     </div>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[c.legalStatus]}`}>
-                      {c.recreational ? "Rec + Med" : c.medical ? "Med" : "Decrim"}
-                    </span>
-                  </div>
+                    <svg className="w-4 h-4 text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
                 ))}
               </div>
             </section>
