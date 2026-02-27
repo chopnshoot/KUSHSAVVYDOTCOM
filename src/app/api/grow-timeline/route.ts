@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { storeResult } from "@/lib/results";
+import { generateGrowTimelineMeta } from "@/lib/result-meta";
 
 export async function POST(request: NextRequest) {
   try {
@@ -68,7 +70,21 @@ Return ONLY valid JSON with no additional text:
     }
 
     const result = JSON.parse(jsonMatch[0]);
-    return NextResponse.json(result);
+
+    const parsedInput = { strain_type, grow_method, experience, environment };
+    const meta = generateGrowTimelineMeta(parsedInput, result);
+    const shareHash = await storeResult({
+      tool: "grow-timeline",
+      input: parsedInput,
+      output: JSON.stringify(result),
+      meta,
+    });
+
+    return NextResponse.json({
+      ...result,
+      shareHash,
+      shareUrl: shareHash ? `/tools/grow-timeline/r/${shareHash}` : undefined,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("Grow timeline error:", message);

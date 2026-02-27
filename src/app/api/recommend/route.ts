@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { storeResult } from "@/lib/results";
+import { generateRecommenderMeta } from "@/lib/result-meta";
 
 export async function POST(request: NextRequest) {
   try {
@@ -106,12 +108,24 @@ Prioritize strains that are commonly found at dispensaries nationwide. Avoid ext
 
     const result = JSON.parse(jsonMatch[0]);
 
+    // Store result for shareable link
+    const parsedInput = { effects, experience, method, avoid, flavor };
+    const meta = generateRecommenderMeta(parsedInput, result);
+    const shareHash = await storeResult({
+      tool: "strain-recommender",
+      input: parsedInput,
+      output: JSON.stringify(result),
+      meta,
+    });
+
     // Include rate limit info in the response
     const responseData = {
       ...result,
       _rateLimit: rateLimit
         ? { remaining: rateLimit.remaining, limit: rateLimit.limit }
         : undefined,
+      shareHash,
+      shareUrl: shareHash ? `/tools/strain-recommender/r/${shareHash}` : undefined,
     };
 
     return NextResponse.json(responseData);

@@ -2,7 +2,9 @@ import { Metadata } from "next";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import StrainRecommender from "@/components/tools/StrainRecommender";
-import Link from "next/link";
+import RelatedTools from "@/components/RelatedTools";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { TOOL_DEFINITIVE_ANSWERS, TOOL_HOWTO_SCHEMAS, TOOL_EXTRA_FAQS } from "@/lib/seo-data";
 
 export const metadata: Metadata = {
   title: "Strain Recommender — Find Your Perfect Cannabis Strain",
@@ -36,18 +38,33 @@ const faqs = [
     answer:
       "While our tool can help identify strains commonly associated with certain effects, it is not a substitute for medical advice. Always consult with a healthcare professional or qualified cannabis physician for medical cannabis recommendations.",
   },
+  ...(TOOL_EXTRA_FAQS["strain-recommender"] || []),
 ];
+
+const howTo = TOOL_HOWTO_SCHEMAS["strain-recommender"];
+const definitiveAnswer = TOOL_DEFINITIVE_ANSWERS["strain-recommender"];
 
 export default function StrainRecommenderPage() {
   return (
     <>
       <Header />
       <main className="max-w-4xl mx-auto px-4 py-12 md:py-20">
+        <Breadcrumbs
+          items={[
+            { label: "Tools", href: "/tools" },
+            { label: "Strain Recommender" },
+          ]}
+        />
+
         <div className="text-center mb-10">
           <h1 className="font-heading text-3xl md:text-5xl text-text-primary mb-4">
             What Strain Should You Try?
           </h1>
+          {/* GEO: Definitive first-paragraph answer */}
           <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+            {definitiveAnswer.answer}
+          </p>
+          <p className="text-text-tertiary text-sm mt-3 max-w-2xl mx-auto">
             Answer 5 quick questions and our AI will recommend 3 strains
             perfectly matched to your preferences and experience level.
           </p>
@@ -55,34 +72,7 @@ export default function StrainRecommenderPage() {
 
         <StrainRecommender />
 
-        {/* Related Tools */}
-        <section className="mt-16 pt-12 border-t border-border">
-          <h2 className="font-heading text-2xl mb-6">Related Tools</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Link
-              href="/tools/edible-dosage-calculator"
-              className="card p-6 block hover:shadow-md transition-shadow"
-            >
-              <h3 className="font-heading text-lg mb-1">
-                Edible Dosage Calculator
-              </h3>
-              <p className="text-text-secondary text-sm">
-                Calculate the right edible dose for your experience level
-              </p>
-            </Link>
-            <Link
-              href="/tools/is-it-legal"
-              className="card p-6 block hover:shadow-md transition-shadow"
-            >
-              <h3 className="font-heading text-lg mb-1">
-                Is It Legal?
-              </h3>
-              <p className="text-text-secondary text-sm">
-                Check cannabis laws in your state
-              </p>
-            </Link>
-          </div>
-        </section>
+        <RelatedTools currentSlug="strain-recommender" />
 
         {/* FAQ */}
         <section className="mt-16 pt-12 border-t border-border">
@@ -121,6 +111,26 @@ export default function StrainRecommenderPage() {
             }),
           }}
         />
+
+        {/* HowTo Schema */}
+        {howTo && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "HowTo",
+                name: howTo.name,
+                description: howTo.description,
+                step: howTo.steps.map((s) => ({
+                  "@type": "HowToStep",
+                  name: s.name,
+                  text: s.text,
+                })),
+              }),
+            }}
+          />
+        )}
       </main>
       <Footer />
     </>

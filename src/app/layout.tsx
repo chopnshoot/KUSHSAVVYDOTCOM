@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -55,7 +56,39 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased bg-background text-text-primary">
+        <GoogleAnalytics />
         {children}
+        {/* Sitewide Organization + WebSite schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                name: "KushSavvy",
+                url: "https://kushsavvy.com",
+                logo: "https://kushsavvy.com/logo.png",
+                description: "AI-powered cannabis tools and educational guides.",
+                sameAs: [
+                  "https://twitter.com/kushsavvy",
+                  "https://instagram.com/kushsavvy",
+                ],
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: "KushSavvy",
+                url: "https://kushsavvy.com",
+                potentialAction: {
+                  "@type": "SearchAction",
+                  target: "https://kushsavvy.com/search?q={search_term_string}",
+                  "query-input": "required name=search_term_string",
+                },
+              },
+            ]),
+          }}
+        />
       </body>
     </html>
   );

@@ -2,7 +2,9 @@ import { Metadata } from "next";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import EdibleDosageCalculator from "@/components/tools/EdibleDosageCalculator";
-import Link from "next/link";
+import RelatedTools from "@/components/RelatedTools";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { TOOL_DEFINITIVE_ANSWERS, TOOL_HOWTO_SCHEMAS, TOOL_EXTRA_FAQS } from "@/lib/seo-data";
 
 export const metadata: Metadata = {
   title: "Edible Dosage Calculator — How Many MG Should You Take?",
@@ -36,18 +38,33 @@ const faqs = [
     answer:
       "Body weight can influence how edibles affect you, but it is not as significant a factor as your overall cannabis tolerance and experience level. Our calculator accounts for body weight as a secondary factor alongside your primary experience level.",
   },
+  ...(TOOL_EXTRA_FAQS["edible-dosage-calculator"] || []),
 ];
+
+const howTo = TOOL_HOWTO_SCHEMAS["edible-dosage-calculator"];
+const definitiveAnswer = TOOL_DEFINITIVE_ANSWERS["edible-dosage-calculator"];
 
 export default function EdibleDosageCalculatorPage() {
   return (
     <>
       <Header />
       <main className="max-w-4xl mx-auto px-4 py-12 md:py-20">
+        <Breadcrumbs
+          items={[
+            { label: "Tools", href: "/tools" },
+            { label: "Edible Dosage Calculator" },
+          ]}
+        />
+
         <div className="text-center mb-10">
           <h1 className="font-heading text-3xl md:text-5xl text-text-primary mb-4">
             Edible Dosage Calculator
           </h1>
+          {/* GEO: Definitive first-paragraph answer */}
           <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+            {definitiveAnswer.answer}
+          </p>
+          <p className="text-text-tertiary text-sm mt-3 max-w-2xl mx-auto">
             Find the right edible dose for your experience level and
             goals. Answer 4 questions for a personalized recommendation
             with timing and safety info.
@@ -56,34 +73,7 @@ export default function EdibleDosageCalculatorPage() {
 
         <EdibleDosageCalculator />
 
-        {/* Related Tools */}
-        <section className="mt-16 pt-12 border-t border-border">
-          <h2 className="font-heading text-2xl mb-6">Related Tools</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Link
-              href="/tools/strain-recommender"
-              className="card p-6 block hover:shadow-md transition-shadow"
-            >
-              <h3 className="font-heading text-lg mb-1">
-                Strain Recommender
-              </h3>
-              <p className="text-text-secondary text-sm">
-                Find the perfect strain for your needs with AI
-              </p>
-            </Link>
-            <Link
-              href="/tools/is-it-legal"
-              className="card p-6 block hover:shadow-md transition-shadow"
-            >
-              <h3 className="font-heading text-lg mb-1">
-                Is It Legal?
-              </h3>
-              <p className="text-text-secondary text-sm">
-                Check cannabis laws in your state
-              </p>
-            </Link>
-          </div>
-        </section>
+        <RelatedTools currentSlug="edible-dosage-calculator" />
 
         {/* FAQ */}
         <section className="mt-16 pt-12 border-t border-border">
@@ -104,6 +94,7 @@ export default function EdibleDosageCalculatorPage() {
           </div>
         </section>
 
+        {/* FAQ Schema */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -121,6 +112,26 @@ export default function EdibleDosageCalculatorPage() {
             }),
           }}
         />
+
+        {/* HowTo Schema */}
+        {howTo && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "HowTo",
+                name: howTo.name,
+                description: howTo.description,
+                step: howTo.steps.map((s) => ({
+                  "@type": "HowToStep",
+                  name: s.name,
+                  text: s.text,
+                })),
+              }),
+            }}
+          />
+        )}
       </main>
       <Footer />
     </>

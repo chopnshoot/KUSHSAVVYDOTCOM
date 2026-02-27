@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { storeResult } from "@/lib/results";
+import { generateCbdVsThcMeta } from "@/lib/result-meta";
 
 export async function POST(request: NextRequest) {
   try {
@@ -69,7 +71,21 @@ Return ONLY valid JSON with no additional text:
     }
 
     const result = JSON.parse(jsonMatch[0]);
-    return NextResponse.json(result);
+
+    const parsedInput = { goal, experience, concerns };
+    const meta = generateCbdVsThcMeta(parsedInput, result);
+    const shareHash = await storeResult({
+      tool: "cbd-vs-thc",
+      input: parsedInput,
+      output: JSON.stringify(result),
+      meta,
+    });
+
+    return NextResponse.json({
+      ...result,
+      shareHash,
+      shareUrl: shareHash ? `/tools/cbd-vs-thc/r/${shareHash}` : undefined,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("CBD vs THC error:", message);

@@ -5,6 +5,7 @@ import strainNames from "@/data/strain-names.json";
 import TurnstileWidget from "@/components/ui/TurnstileWidget";
 import RateLimitPrompt from "@/components/ui/RateLimitPrompt";
 import UsageCounter from "@/components/ui/UsageCounter";
+import ShareBar from "@/components/ShareBar";
 
 interface StrainInfo {
   name: string;
@@ -134,6 +135,7 @@ export default function StrainCompare() {
   const [rateLimited, setRateLimited] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   const handleTurnstileVerify = useCallback((token: string) => {
     setTurnstileToken(token);
@@ -167,6 +169,12 @@ export default function StrainCompare() {
       if (!response.ok) throw new Error(data.error || `Request failed with status ${response.status}`);
       setResult(data);
 
+      // Update URL to shareable link
+      if (data.shareUrl) {
+        setShareUrl(data.shareUrl);
+        window.history.pushState({ tool: "strain-compare", hash: data.shareHash }, "", data.shareUrl);
+      }
+
       // Update usage counter from response
       if (data._rateLimit) {
         setUsage({
@@ -197,12 +205,27 @@ export default function StrainCompare() {
 
   if (loading) {
     return (
-      <div className="tool-container text-center py-16">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-green mx-auto mb-4" />
-        <p className="text-text-secondary text-lg">
-          Comparing {strain1} vs {strain2}...
-        </p>
-        <p className="text-text-tertiary text-sm mt-2">This usually takes 5-10 seconds</p>
+      <div className="space-y-8">
+        <div className="text-center mb-4">
+          <p className="text-text-secondary text-lg">Comparing {strain1} vs {strain2}...</p>
+          <p className="text-text-tertiary text-sm mt-1">This usually takes 5-10 seconds</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[1, 2].map((i) => (
+            <div key={i} className="animate-pulse rounded-card border border-border bg-surface p-6">
+              <div className="h-6 bg-tag-bg rounded w-1/2 mb-4" />
+              <div className="space-y-3">
+                <div className="flex justify-between"><div className="h-4 bg-tag-bg rounded w-8" /><div className="h-4 bg-tag-bg rounded w-16" /></div>
+                <div className="flex justify-between"><div className="h-4 bg-tag-bg rounded w-8" /><div className="h-4 bg-tag-bg rounded w-12" /></div>
+                <div className="flex gap-2 mt-2">{[1,2,3].map(j=><div key={j} className="h-6 bg-tag-bg rounded-full w-16"/>)}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="animate-pulse tool-container">
+          <div className="h-5 bg-tag-bg rounded w-1/4 mb-4" />
+          <div className="space-y-2"><div className="h-4 bg-tag-bg rounded w-full" /><div className="h-4 bg-tag-bg rounded w-5/6" /><div className="h-4 bg-tag-bg rounded w-4/6" /></div>
+        </div>
       </div>
     );
   }
@@ -324,6 +347,12 @@ export default function StrainCompare() {
         <div className="text-center">
           <button onClick={handleReset} className="btn-secondary">Compare Different Strains</button>
         </div>
+        {shareUrl && (
+          <ShareBar
+            url={shareUrl}
+            text={`${strain1} vs ${strain2} — check out this strain comparison on KushSavvy!`}
+          />
+        )}
         {usage && <UsageCounter used={usage.used} limit={usage.limit} />}
       </div>
     );

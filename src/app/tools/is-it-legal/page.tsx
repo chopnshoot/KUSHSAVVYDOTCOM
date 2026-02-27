@@ -3,7 +3,9 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import IsItLegal from "@/components/tools/IsItLegal";
 import { getAllStateLaws } from "@/lib/sanity";
-import Link from "next/link";
+import RelatedTools from "@/components/RelatedTools";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { TOOL_DEFINITIVE_ANSWERS, TOOL_EXTRA_FAQS } from "@/lib/seo-data";
 
 export const metadata: Metadata = {
   title: "Is Cannabis Legal in Your State? — State Law Checker",
@@ -32,7 +34,10 @@ const faqs = [
     answer:
       "In states with legal recreational cannabis, the minimum age is 21. Medical cannabis age requirements vary by state but typically require patients to be 18 or older with a qualifying condition.",
   },
+  ...(TOOL_EXTRA_FAQS["is-it-legal"] || []),
 ];
+
+const definitiveAnswer = TOOL_DEFINITIVE_ANSWERS["is-it-legal"];
 
 export default async function IsItLegalPage() {
   const seedStateLaws = await getAllStateLaws();
@@ -57,11 +62,22 @@ export default async function IsItLegalPage() {
     <>
       <Header />
       <main className="max-w-4xl mx-auto px-4 py-12 md:py-20">
+        <Breadcrumbs
+          items={[
+            { label: "Tools", href: "/tools" },
+            { label: "Is It Legal?" },
+          ]}
+        />
+
         <div className="text-center mb-10">
           <h1 className="font-heading text-3xl md:text-5xl text-text-primary mb-4">
             Is Cannabis Legal in Your State?
           </h1>
+          {/* GEO: Definitive first-paragraph answer */}
           <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+            {definitiveAnswer.answer}
+          </p>
+          <p className="text-text-tertiary text-sm mt-3 max-w-2xl mx-auto">
             Check cannabis laws, possession limits, home growing rules, and
             regulations for all 50 US states. Updated for 2026.
           </p>
@@ -69,34 +85,7 @@ export default async function IsItLegalPage() {
 
         <IsItLegal states={states} />
 
-        {/* Related Tools */}
-        <section className="mt-16 pt-12 border-t border-border">
-          <h2 className="font-heading text-2xl mb-6">Related Tools</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Link
-              href="/tools/strain-recommender"
-              className="card p-6 block hover:shadow-md transition-shadow"
-            >
-              <h3 className="font-heading text-lg mb-1">
-                Strain Recommender
-              </h3>
-              <p className="text-text-secondary text-sm">
-                Find the perfect strain for your needs
-              </p>
-            </Link>
-            <Link
-              href="/tools/edible-dosage-calculator"
-              className="card p-6 block hover:shadow-md transition-shadow"
-            >
-              <h3 className="font-heading text-lg mb-1">
-                Edible Dosage Calculator
-              </h3>
-              <p className="text-text-secondary text-sm">
-                Calculate the right dose for your experience level
-              </p>
-            </Link>
-          </div>
-        </section>
+        <RelatedTools currentSlug="is-it-legal" />
 
         {/* FAQ */}
         <section className="mt-16 pt-12 border-t border-border">
@@ -117,6 +106,7 @@ export default async function IsItLegalPage() {
           </div>
         </section>
 
+        {/* FAQ Schema */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
