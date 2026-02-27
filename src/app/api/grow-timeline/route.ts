@@ -73,12 +73,17 @@ Return ONLY valid JSON with no additional text:
 
     const parsedInput = { strain_type, grow_method, experience, environment };
     const meta = generateGrowTimelineMeta(parsedInput, result);
-    const shareHash = await storeResult({
-      tool: "grow-timeline",
-      input: parsedInput,
-      output: JSON.stringify(result),
-      meta,
-    });
+    let shareHash: string | null = null;
+    try {
+      shareHash = await storeResult({
+        tool: "grow-timeline",
+        input: parsedInput,
+        output: JSON.stringify(result),
+        meta,
+      });
+    } catch (err) {
+      console.error("Failed to store shareable result:", err instanceof Error ? err.message : err);
+    }
 
     return NextResponse.json({
       ...result,

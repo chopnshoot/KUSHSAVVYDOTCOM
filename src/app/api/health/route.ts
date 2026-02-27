@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { Redis } from "@upstash/redis";
 
 export async function GET() {
   const checks: Record<string, string> = {};
@@ -24,8 +25,27 @@ export async function GET() {
     checks.api_call = `success (response: ${text?.type === "text" ? text.text : "no text"})`;
   } catch (error) {
     checks.api_call = `FAILED: ${error instanceof Error ? error.message : String(error)}`;
-    return NextResponse.json({ status: "error", checks }, { status: 500 });
   }
 
-  return NextResponse.json({ status: "ok", checks });
+  // Check Redis (Upstash) — required for shareable result links
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!redisUrl || !redisToken) {
+    checks.redis = "MISSING — shareable links will not work";
+  } else {
+    try {
+      const redis = new Redis({ url: redisUrl, token: redisToken });
+      await redis.set("health-check", "ok", { ex: 60 });
+      const val = await redis.get("health-check");
+      checks.redis = val === "ok" ? "connected" : `unexpected value: ${val}`;
+    } catch (error) {
+      checks.redis = `FAILED: ${error instanceof Error ? error.message : String(error)}`;
+    }
+  }
+
+  const hasFailure = Object.values(checks).some((v) => v.startsWith("FAILED") || v === "MISSING" || v.startsWith("MISSING"));
+  return NextResponse.json(
+    { status: hasFailure ? "degraded" : "ok", checks },
+    { status: hasFailure ? 503 : 200 }
+  );
 }

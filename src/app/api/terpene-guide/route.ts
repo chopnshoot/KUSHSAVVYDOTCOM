@@ -62,12 +62,17 @@ Return ONLY valid JSON with no additional text:
 
     const parsedInput = { terpene };
     const meta = generateTerpeneGuideMeta(parsedInput, result);
-    const shareHash = await storeResult({
-      tool: "terpene-guide",
-      input: parsedInput,
-      output: JSON.stringify(result),
-      meta,
-    });
+    let shareHash: string | null = null;
+    try {
+      shareHash = await storeResult({
+        tool: "terpene-guide",
+        input: parsedInput,
+        output: JSON.stringify(result),
+        meta,
+      });
+    } catch (err) {
+      console.error("Failed to store shareable result:", err instanceof Error ? err.message : err);
+    }
 
     return NextResponse.json({
       ...result,
