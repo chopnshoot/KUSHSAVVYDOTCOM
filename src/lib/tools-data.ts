@@ -64,13 +64,6 @@ export const tools: ToolInfo[] = [
     available: true,
   },
   {
-    slug: "strain-journal",
-    title: "Strain Journal",
-    description: "Track and rate strains you have tried to get personalized recommendations",
-    icon: "📓",
-    available: true,
-  },
-  {
     slug: "cbd-vs-thc",
     title: "CBD vs THC",
     description:

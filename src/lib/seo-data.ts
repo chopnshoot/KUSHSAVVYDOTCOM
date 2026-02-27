@@ -5,10 +5,9 @@ export const TOOL_RELATIONSHIPS: Record<string, string[]> = {
   "strain-compare": ["strain-recommender", "terpene-guide", "cbd-vs-thc"],
   "is-it-legal": ["cost-calculator", "strain-recommender", "edible-dosage-calculator"],
   "terpene-guide": ["strain-recommender", "strain-compare", "cbd-vs-thc"],
-  "tolerance-break-planner": ["edible-dosage-calculator", "cost-calculator", "strain-journal"],
+  "tolerance-break-planner": ["edible-dosage-calculator", "cost-calculator", "strain-recommender"],
   "cost-calculator": ["tolerance-break-planner", "edible-dosage-calculator", "grow-timeline"],
   "grow-timeline": ["cost-calculator", "terpene-guide", "strain-recommender"],
-  "strain-journal": ["strain-recommender", "strain-compare", "terpene-guide"],
   "cbd-vs-thc": ["edible-dosage-calculator", "terpene-guide", "strain-recommender"],
 };
 
@@ -49,10 +48,6 @@ export const TOOL_DEFINITIVE_ANSWERS: Record<string, { question: string; answer:
   "terpene-guide": {
     question: "What are cannabis terpenes?",
     answer: "Terpenes are aromatic compounds in cannabis that influence smell, taste, and effects. The most common cannabis terpenes are myrcene (relaxing), limonene (uplifting), caryophyllene (pain relief), pinene (focus), and linalool (calming). Terpenes work with cannabinoids through the entourage effect.",
-  },
-  "strain-journal": {
-    question: "How do I track my cannabis experiences?",
-    answer: "A strain journal helps you log each cannabis session with details like the strain name, consumption method, dosage, effects, and personal rating. Over time, tracking your sessions reveals which strains and doses work best for you.",
   },
 };
 

@@ -3,7 +3,6 @@ import Link from "next/link";
 const TOOL_NAMES: Record<string, string> = {
   "strain-recommender": "Strain Recommender",
   "strain-compare": "Strain Comparison",
-  "strain-journal": "Strain Journal",
   "cbd-vs-thc": "CBD vs THC",
   "tolerance-break-planner": "Tolerance Break Planner",
   "grow-timeline": "Grow Timeline",
