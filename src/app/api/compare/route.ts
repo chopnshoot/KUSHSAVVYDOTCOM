@@ -127,12 +127,17 @@ Return ONLY valid JSON with no additional text:
     const s2 = typeof strain2 === "string" ? strain2 : JSON.stringify(strain2);
     const parsedInput = { strain1: s1, strain2: s2 };
     const meta = generateComparisonMeta(parsedInput);
-    const shareHash = await storeComparisonResult(s1, s2, {
-      tool: "strain-compare",
-      input: parsedInput,
-      output: JSON.stringify(result),
-      meta,
-    });
+    let shareHash: string | null = null;
+    try {
+      shareHash = await storeComparisonResult(s1, s2, {
+        tool: "strain-compare",
+        input: parsedInput,
+        output: JSON.stringify(result),
+        meta,
+      });
+    } catch (err) {
+      console.error("Failed to store shareable result:", err instanceof Error ? err.message : err);
+    }
 
     // Include rate limit info in the response
     const responseData = {

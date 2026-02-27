@@ -68,11 +68,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 function RecommenderResult({ data }: { data: { recommendations: Array<{ name: string; type: string; ratio: string; thc_range: string; cbd_range: string; terpenes: string[]; effects: string[]; flavors: string[]; best_for: string; description: string; why_for_you: string }> } }) {
+  const recs = Array.isArray(data?.recommendations) ? data.recommendations : [];
+  if (recs.length === 0) return <p className="text-center text-text-secondary">No recommendations found in this result.</p>;
+
   return (
     <div className="space-y-6">
       <h2 className="font-heading text-2xl md:text-3xl text-center mb-8">Personalized Strain Recommendations</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {data.recommendations.map((rec, i) => (
+        {recs.map((rec, i) => (
           <div key={i} className="rounded-card border border-border bg-surface p-6">
             <h3 className="font-heading text-xl mb-1">{rec.name}</h3>
             <span className="text-xs text-text-tertiary font-mono">{rec.type} {rec.ratio && `| ${rec.ratio}`}</span>
@@ -80,8 +83,8 @@ function RecommenderResult({ data }: { data: { recommendations: Array<{ name: st
               <div className="flex justify-between"><span className="text-text-tertiary">THC</span><span className="font-mono font-semibold">{rec.thc_range}</span></div>
               <div className="flex justify-between"><span className="text-text-tertiary">CBD</span><span className="font-mono font-semibold">{rec.cbd_range}</span></div>
             </div>
-            <div className="flex flex-wrap gap-1 mt-3">{rec.effects.map(e => <span key={e} className="tag text-xs">{e}</span>)}</div>
-            <div className="flex flex-wrap gap-1 mt-2">{rec.terpenes.map(t => <span key={t} className="text-xs px-2 py-0.5 rounded-full border border-accent-green/20 bg-accent-green/5 text-accent-green font-mono">{t}</span>)}</div>
+            {Array.isArray(rec.effects) && <div className="flex flex-wrap gap-1 mt-3">{rec.effects.map(e => <span key={e} className="tag text-xs">{e}</span>)}</div>}
+            {Array.isArray(rec.terpenes) && <div className="flex flex-wrap gap-1 mt-2">{rec.terpenes.map(t => <span key={t} className="text-xs px-2 py-0.5 rounded-full border border-accent-green/20 bg-accent-green/5 text-accent-green font-mono">{t}</span>)}</div>}
             <p className="text-text-secondary text-sm mt-3">{rec.description}</p>
             <p className="text-accent-green text-sm mt-2 font-medium">{rec.why_for_you}</p>
           </div>

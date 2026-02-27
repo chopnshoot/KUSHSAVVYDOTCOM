@@ -74,12 +74,17 @@ Return ONLY valid JSON with no additional text:
 
     const parsedInput = { goal, experience, concerns };
     const meta = generateCbdVsThcMeta(parsedInput, result);
-    const shareHash = await storeResult({
-      tool: "cbd-vs-thc",
-      input: parsedInput,
-      output: JSON.stringify(result),
-      meta,
-    });
+    let shareHash: string | null = null;
+    try {
+      shareHash = await storeResult({
+        tool: "cbd-vs-thc",
+        input: parsedInput,
+        output: JSON.stringify(result),
+        meta,
+      });
+    } catch (err) {
+      console.error("Failed to store shareable result:", err instanceof Error ? err.message : err);
+    }
 
     return NextResponse.json({
       ...result,

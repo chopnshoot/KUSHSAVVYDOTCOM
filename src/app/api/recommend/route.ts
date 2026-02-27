@@ -108,15 +108,20 @@ Prioritize strains that are commonly found at dispensaries nationwide. Avoid ext
 
     const result = JSON.parse(jsonMatch[0]);
 
-    // Store result for shareable link
+    // Store result for shareable link (non-fatal — recommendations still work if Redis fails)
     const parsedInput = { effects, experience, method, avoid, flavor };
     const meta = generateRecommenderMeta(parsedInput, result);
-    const shareHash = await storeResult({
-      tool: "strain-recommender",
-      input: parsedInput,
-      output: JSON.stringify(result),
-      meta,
-    });
+    let shareHash: string | null = null;
+    try {
+      shareHash = await storeResult({
+        tool: "strain-recommender",
+        input: parsedInput,
+        output: JSON.stringify(result),
+        meta,
+      });
+    } catch (err) {
+      console.error("Failed to store shareable result:", err instanceof Error ? err.message : err);
+    }
 
     // Include rate limit info in the response
     const responseData = {
