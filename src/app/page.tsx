@@ -4,7 +4,7 @@ import { getArticles, slugifyArticle } from "@/lib/sanity";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ToolCard from "@/components/ui/ToolCard";
-import NewsletterSignup from "@/components/ui/NewsletterSignup";
+import HeroToolCarousel from "@/components/HeroToolCarousel";
 
 export default async function HomePage() {
   const featuredTools = tools
@@ -57,6 +57,18 @@ export default async function HomePage() {
                 Browse All Tools
               </Link>
             </div>
+
+            {/* Tool Carousel */}
+            <HeroToolCarousel
+              tools={tools
+                .filter((t) => t.available)
+                .map(({ slug, title, description, icon }) => ({
+                  slug,
+                  title,
+                  description,
+                  icon,
+                }))}
+            />
           </div>
         </section>
 
@@ -207,12 +219,6 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Newsletter */}
-        <section className="bg-accent-green/5 py-16 md:py-24">
-          <div className="max-w-2xl mx-auto px-4">
-            <NewsletterSignup />
-          </div>
-        </section>
       </main>
       <Footer />
     </>
