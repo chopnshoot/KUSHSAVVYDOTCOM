@@ -6,8 +6,19 @@ import StrainResultCard from "@/components/ui/StrainResultCard";
 import TurnstileWidget from "@/components/ui/TurnstileWidget";
 import RateLimitPrompt from "@/components/ui/RateLimitPrompt";
 import UsageCounter from "@/components/ui/UsageCounter";
+import LoadingMeter from "@/components/ui/LoadingMeter";
 import ShareBar from "@/components/ShareBar";
 import { StrainRecommendation } from "@/lib/types";
+
+const LOADING_MESSAGES = [
+  "Scanning the menu...",
+  "Checking terpene profiles...",
+  "Cross-referencing your vibe...",
+  "Consulting the budtender AI...",
+  "Matching flavor notes...",
+  "Dialing in the perfect ratio...",
+  "Almost there — rolling up your results...",
+];
 
 const quizSteps = [
   {
@@ -179,30 +190,10 @@ export default function StrainRecommender() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="text-center mb-8">
-          <h2 className="font-heading text-2xl md:text-3xl mb-2">Finding Your Perfect Strains...</h2>
-          <p className="text-text-secondary">This usually takes 5-10 seconds</p>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="animate-pulse rounded-card border border-border bg-surface p-6">
-              <div className="h-6 bg-tag-bg rounded w-2/3 mb-3" />
-              <div className="h-4 bg-tag-bg rounded w-1/3 mb-4" />
-              <div className="space-y-2">
-                <div className="h-4 bg-tag-bg rounded w-full" />
-                <div className="h-4 bg-tag-bg rounded w-5/6" />
-                <div className="h-4 bg-tag-bg rounded w-4/6" />
-              </div>
-              <div className="flex gap-2 mt-4">
-                <div className="h-6 bg-tag-bg rounded-full w-16" />
-                <div className="h-6 bg-tag-bg rounded-full w-20" />
-                <div className="h-6 bg-tag-bg rounded-full w-14" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <LoadingMeter
+        title="Finding Your Perfect Strains"
+        messages={LOADING_MESSAGES}
+      />
     );
   }
 

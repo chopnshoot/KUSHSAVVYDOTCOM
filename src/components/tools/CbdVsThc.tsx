@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import LoadingMeter from "@/components/ui/LoadingMeter";
 import ShareBar from "@/components/ShareBar";
 
 interface CannabinoidBreakdown {
@@ -109,11 +110,19 @@ export default function CbdVsThc() {
 
   if (loading) {
     return (
-      <div className="tool-container text-center py-16">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-green mx-auto mb-4" />
-        <p className="text-text-secondary text-lg">Analyzing the best cannabinoid for your needs...</p>
-        <p className="text-text-tertiary text-sm mt-2">This usually takes 5-10 seconds</p>
-      </div>
+      <LoadingMeter
+        title="Analyzing Cannabinoids"
+        icon="&#x1F9EA;"
+        messages={[
+          "Reviewing your goals...",
+          "Comparing CBD and THC profiles...",
+          "Checking interaction data...",
+          "Evaluating dosage strategies...",
+          "Weighing the research...",
+          "Crafting your recommendation...",
+          "Almost there — fine-tuning the ratio...",
+        ]}
+      />
     );
   }
 

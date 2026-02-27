@@ -21,7 +21,7 @@ export const tools: ToolInfo[] = [
     slug: "is-it-legal",
     title: "Is It Legal?",
     description:
-      "Check cannabis laws and regulations in your state",
+      "Check cannabis laws in your state or country",
     icon: "📋",
     available: true,
   },

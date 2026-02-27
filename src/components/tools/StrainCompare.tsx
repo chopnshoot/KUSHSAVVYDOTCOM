@@ -5,6 +5,7 @@ import strainNames from "@/data/strain-names.json";
 import TurnstileWidget from "@/components/ui/TurnstileWidget";
 import RateLimitPrompt from "@/components/ui/RateLimitPrompt";
 import UsageCounter from "@/components/ui/UsageCounter";
+import LoadingMeter from "@/components/ui/LoadingMeter";
 import ShareBar from "@/components/ShareBar";
 
 interface StrainInfo {
@@ -205,28 +206,19 @@ export default function StrainCompare() {
 
   if (loading) {
     return (
-      <div className="space-y-8">
-        <div className="text-center mb-4">
-          <p className="text-text-secondary text-lg">Comparing {strain1} vs {strain2}...</p>
-          <p className="text-text-tertiary text-sm mt-1">This usually takes 5-10 seconds</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {[1, 2].map((i) => (
-            <div key={i} className="animate-pulse rounded-card border border-border bg-surface p-6">
-              <div className="h-6 bg-tag-bg rounded w-1/2 mb-4" />
-              <div className="space-y-3">
-                <div className="flex justify-between"><div className="h-4 bg-tag-bg rounded w-8" /><div className="h-4 bg-tag-bg rounded w-16" /></div>
-                <div className="flex justify-between"><div className="h-4 bg-tag-bg rounded w-8" /><div className="h-4 bg-tag-bg rounded w-12" /></div>
-                <div className="flex gap-2 mt-2">{[1,2,3].map(j=><div key={j} className="h-6 bg-tag-bg rounded-full w-16"/>)}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="animate-pulse tool-container">
-          <div className="h-5 bg-tag-bg rounded w-1/4 mb-4" />
-          <div className="space-y-2"><div className="h-4 bg-tag-bg rounded w-full" /><div className="h-4 bg-tag-bg rounded w-5/6" /><div className="h-4 bg-tag-bg rounded w-4/6" /></div>
-        </div>
-      </div>
+      <LoadingMeter
+        title={`${strain1} vs ${strain2}`}
+        icon="&#x2696;"
+        messages={[
+          "Pulling up strain profiles...",
+          "Comparing terpene fingerprints...",
+          "Analyzing THC and CBD levels...",
+          "Weighing the effects...",
+          "Cross-checking user reviews...",
+          "Writing up the verdict...",
+          "Almost there — finalizing the showdown...",
+        ]}
+      />
     );
   }
 

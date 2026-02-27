@@ -3,14 +3,15 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import IsItLegal from "@/components/tools/IsItLegal";
 import { getAllStateLaws } from "@/lib/sanity";
+import { seedCountryLaws } from "@/lib/seed-countries";
 import RelatedTools from "@/components/RelatedTools";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { TOOL_DEFINITIVE_ANSWERS, TOOL_EXTRA_FAQS } from "@/lib/seo-data";
 
 export const metadata: Metadata = {
-  title: "Is Cannabis Legal in Your State? — State Law Checker",
+  title: "Is Cannabis Legal? — Check Laws by State & Country",
   description:
-    "Check cannabis laws in all 50 US states. Find out if marijuana is legal, medical-only, decriminalized, or illegal in your state, plus possession limits and regulations.",
+    "Check cannabis laws in all 50 US states and 40+ countries worldwide. Find out if marijuana is legal, medical-only, decriminalized, or illegal where you are.",
 };
 
 const faqs = [
@@ -58,6 +59,16 @@ export default async function IsItLegalPage() {
     regulatoryUrl: s.regulatoryUrl,
   }));
 
+  const countries = seedCountryLaws.map((c) => ({
+    country: c.country,
+    code: c.code,
+    legalStatus: c.legalStatus,
+    recreational: c.recreational,
+    medical: c.medical,
+    summary: c.summary,
+    recentChanges: c.recentChanges,
+  }));
+
   return (
     <>
       <Header />
@@ -71,7 +82,7 @@ export default async function IsItLegalPage() {
 
         <div className="text-center mb-10">
           <h1 className="font-heading text-3xl md:text-5xl text-text-primary mb-4">
-            Is Cannabis Legal in Your State?
+            Is Cannabis Legal Where You Are?
           </h1>
           {/* GEO: Definitive first-paragraph answer */}
           <p className="text-text-secondary text-lg max-w-2xl mx-auto">
@@ -79,11 +90,11 @@ export default async function IsItLegalPage() {
           </p>
           <p className="text-text-tertiary text-sm mt-3 max-w-2xl mx-auto">
             Check cannabis laws, possession limits, home growing rules, and
-            regulations for all 50 US states. Updated for 2026.
+            regulations for all 50 US states and 40+ countries. Updated for 2026.
           </p>
         </div>
 
-        <IsItLegal states={states} />
+        <IsItLegal states={states} countries={countries} />
 
         <RelatedTools currentSlug="is-it-legal" />
 
