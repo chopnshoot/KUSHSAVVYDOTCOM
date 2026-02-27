@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import QuizStep from "@/components/ui/QuizStep";
 import StrainResultCard from "@/components/ui/StrainResultCard";
 import TurnstileWidget from "@/components/ui/TurnstileWidget";
@@ -8,6 +8,69 @@ import RateLimitPrompt from "@/components/ui/RateLimitPrompt";
 import UsageCounter from "@/components/ui/UsageCounter";
 import ShareBar from "@/components/ShareBar";
 import { StrainRecommendation } from "@/lib/types";
+
+const LOADING_MESSAGES = [
+  "Scanning the menu...",
+  "Checking terpene profiles...",
+  "Cross-referencing your vibe...",
+  "Consulting the budtender AI...",
+  "Matching flavor notes...",
+  "Dialing in the perfect ratio...",
+  "Almost there — rolling up your results...",
+];
+
+function LoadingMeter() {
+  const [progress, setProgress] = useState(0);
+  const [msgIndex, setMsgIndex] = useState(0);
+  const startTime = useRef(Date.now());
+
+  useEffect(() => {
+    const progressTimer = setInterval(() => {
+      const elapsed = (Date.now() - startTime.current) / 1000;
+      // Fast at first, slows down asymptotically toward 92%
+      const next = Math.min(92, 30 * Math.log10(elapsed + 1) + elapsed * 2);
+      setProgress(next);
+    }, 80);
+
+    const msgTimer = setInterval(() => {
+      setMsgIndex((i) => (i + 1) % LOADING_MESSAGES.length);
+    }, 2200);
+
+    return () => {
+      clearInterval(progressTimer);
+      clearInterval(msgTimer);
+    };
+  }, []);
+
+  return (
+    <div className="tool-container text-center py-12 max-w-lg mx-auto">
+      <div className="text-4xl mb-6" aria-hidden="true">
+        <span className="inline-block animate-bounce">&#127807;</span>
+      </div>
+      <h2 className="font-heading text-2xl md:text-3xl mb-2">
+        Finding Your Perfect Strains
+      </h2>
+      <p
+        className="text-text-secondary text-sm mb-8 h-5 transition-opacity duration-300"
+        key={msgIndex}
+      >
+        {LOADING_MESSAGES[msgIndex]}
+      </p>
+      <div className="w-full h-3 rounded-full bg-surface border border-border overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-300 ease-out"
+          style={{
+            width: `${progress}%`,
+            background: "linear-gradient(90deg, #2D6A4F, #7B2D8E)",
+          }}
+        />
+      </div>
+      <p className="text-text-tertiary text-xs mt-3 font-mono">
+        {Math.round(progress)}%
+      </p>
+    </div>
+  );
+}
 
 const quizSteps = [
   {
@@ -178,32 +241,7 @@ export default function StrainRecommender() {
   };
 
   if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="text-center mb-8">
-          <h2 className="font-heading text-2xl md:text-3xl mb-2">Finding Your Perfect Strains...</h2>
-          <p className="text-text-secondary">This usually takes 5-10 seconds</p>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="animate-pulse rounded-card border border-border bg-surface p-6">
-              <div className="h-6 bg-tag-bg rounded w-2/3 mb-3" />
-              <div className="h-4 bg-tag-bg rounded w-1/3 mb-4" />
-              <div className="space-y-2">
-                <div className="h-4 bg-tag-bg rounded w-full" />
-                <div className="h-4 bg-tag-bg rounded w-5/6" />
-                <div className="h-4 bg-tag-bg rounded w-4/6" />
-              </div>
-              <div className="flex gap-2 mt-4">
-                <div className="h-6 bg-tag-bg rounded-full w-16" />
-                <div className="h-6 bg-tag-bg rounded-full w-20" />
-                <div className="h-6 bg-tag-bg rounded-full w-14" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    return <LoadingMeter />;
   }
 
   if (rateLimited) {
