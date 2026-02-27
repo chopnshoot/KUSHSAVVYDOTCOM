@@ -38,6 +38,7 @@ const footerLinkGroups: FooterLinkGroup[] = [
     title: "Company",
     links: [
       { label: "About", href: "/about" },
+      { label: "Contact", href: "/contact" },
       { label: "Newsletter", href: "/newsletter" },
       { label: "All Tools", href: "/tools" },
     ],
