@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import LoadingMeter from "@/components/ui/LoadingMeter";
 import ShareBar from "@/components/ShareBar";
 
 interface GrowPhase {
@@ -101,11 +102,19 @@ export default function GrowTimeline() {
 
   if (loading) {
     return (
-      <div className="tool-container text-center py-16">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-green mx-auto mb-4" />
-        <p className="text-text-secondary text-lg">Building your grow timeline...</p>
-        <p className="text-text-tertiary text-sm mt-2">This usually takes 5-10 seconds</p>
-      </div>
+      <LoadingMeter
+        title="Building Your Grow Timeline"
+        icon="&#x1F331;"
+        messages={[
+          "Selecting the best nutrients...",
+          "Mapping out the grow phases...",
+          "Calculating light schedules...",
+          "Planning the feeding chart...",
+          "Checking strain-specific timelines...",
+          "Adding pro tips for your setup...",
+          "Almost there — estimating your yield...",
+        ]}
+      />
     );
   }
 

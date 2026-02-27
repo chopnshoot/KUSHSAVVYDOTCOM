@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import LoadingMeter from "@/components/ui/LoadingMeter";
 import ShareBar from "@/components/ShareBar";
 
 interface Phase {
@@ -96,11 +97,19 @@ export default function ToleranceBreakPlanner() {
 
   if (loading) {
     return (
-      <div className="tool-container text-center py-16">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-green mx-auto mb-4" />
-        <p className="text-text-secondary text-lg">Building your personalized tolerance break plan...</p>
-        <p className="text-text-tertiary text-sm mt-2">This usually takes 5-10 seconds</p>
-      </div>
+      <LoadingMeter
+        title="Crafting Your T-Break Plan"
+        icon="&#x1F9D8;"
+        messages={[
+          "Assessing your current tolerance...",
+          "Mapping out the timeline...",
+          "Adding daily coping strategies...",
+          "Researching helpful supplements...",
+          "Setting realistic milestones...",
+          "Personalizing tips for your goals...",
+          "Almost there — finalizing your plan...",
+        ]}
+      />
     );
   }
 
