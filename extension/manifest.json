@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "KushSavvy — AI Cannabis Insights",
+  "short_name": "KushSavvy",
+  "version": "2.0.0",
+  "description": "Your AI budtender, everywhere you shop. Get instant cannabis insights on Weedmaps, Leafly, and any dispensary menu.",
+  "permissions": [
+    "storage",
+    "sidePanel",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "*://*.weedmaps.com/*",
+    "*://*.leafly.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.weedmaps.com/*",
+        "*://*.leafly.com/*"
+      ],
+      "js": ["src/content/content-script.ts"],
+      "run_at": "document_idle"
+    }
+  ],
+  "side_panel": {
+    "default_path": "src/sidepanel/index.html"
+  },
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_icon": {
+      "16": "public/icons/icon16.png",
+      "48": "public/icons/icon48.png",
+      "128": "public/icons/icon128.png"
+    },
+    "default_title": "KushSavvy — AI Cannabis Insights"
+  },
+  "icons": {
+    "16": "public/icons/icon16.png",
+    "48": "public/icons/icon48.png",
+    "128": "public/icons/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["public/icons/*.png"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
