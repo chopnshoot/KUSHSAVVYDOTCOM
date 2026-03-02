@@ -46,10 +46,10 @@ export default function NewsletterSignup() {
   if (status === "success") {
     return (
       <div className="text-center">
-        <p className="font-heading text-lg font-semibold text-accent-green">
+        <p className="font-heading text-lg font-semibold text-accent-green-light">
           You&apos;re in!
         </p>
-        <p className="mt-1 font-body text-sm text-text-secondary">
+        <p className="mt-1 font-body text-sm text-gray-400">
           Check your inbox for a confirmation email.
         </p>
       </div>
@@ -58,16 +58,16 @@ export default function NewsletterSignup() {
 
   return (
     <div className="text-center">
-      <h3 className="font-heading text-xl font-semibold text-text-primary sm:text-2xl">
+      <h3 className="font-heading text-xl font-semibold text-white sm:text-2xl">
         Get weekly strain recommendations and cannabis insights
       </h3>
-      <p className="mt-2 font-body text-sm text-text-secondary">
+      <p className="mt-2 font-body text-sm text-gray-400">
         Join thousands of informed consumers. No spam, unsubscribe anytime.
       </p>
 
       <form
         onSubmit={handleSubmit}
-        className="mx-auto mt-6 flex max-w-md flex-col gap-3 sm:flex-row"
+        className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row"
       >
         <label htmlFor="newsletter-email" className="sr-only">
           Email address
@@ -80,19 +80,19 @@ export default function NewsletterSignup() {
           placeholder="you@example.com"
           required
           disabled={status === "loading"}
-          className="flex-1 rounded-lg border border-border bg-surface px-4 py-2.5 font-body text-sm text-text-primary placeholder:text-text-tertiary focus:border-accent-green focus:outline-none focus:ring-1 focus:ring-accent-green disabled:opacity-60"
+          className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-body text-sm text-white placeholder:text-gray-500 focus:border-accent-green focus:outline-none focus:ring-1 focus:ring-accent-green disabled:opacity-60 backdrop-blur-sm"
         />
         <button
           type="submit"
           disabled={status === "loading"}
-          className="inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-warm px-6 py-2.5 font-body text-sm font-semibold text-white transition-colors hover:bg-warm/90 focus:outline-none focus:ring-2 focus:ring-warm focus:ring-offset-2 disabled:opacity-60"
+          className="inline-flex items-center justify-center whitespace-nowrap rounded-xl bg-accent-green px-6 py-3 font-body text-sm font-semibold text-white transition-all hover:bg-accent-green-light hover:shadow-lg hover:shadow-accent-green/25 focus:outline-none focus:ring-2 focus:ring-accent-green focus:ring-offset-2 focus:ring-offset-[#0F1A14] disabled:opacity-60"
         >
           {status === "loading" ? "Subscribing..." : "Subscribe"}
         </button>
       </form>
 
       {status === "error" && (
-        <p className="mt-3 font-body text-sm text-red-600" role="alert">
+        <p className="mt-3 font-body text-sm text-red-400" role="alert">
           {errorMessage}
         </p>
       )}
