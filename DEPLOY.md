@@ -39,12 +39,17 @@ Go to your Vercel project → Settings → Environment Variables and add:
 
 | Variable | Value | Notes |
 |----------|-------|-------|
-| `ANTHROPIC_API_KEY` | `sk-ant-...` | Your Claude API key from console.anthropic.com |
+| `ANTHROPIC_API_KEY` | `sk-ant-...` | Claude API key — Tier 2 AI (COA analysis, AI parser) |
+| `OPENAI_API_KEY` | `sk-...` | OpenAI key — Tier 1 AI (strain insights, 90% of calls) |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID` | (from Step 3) | Sanity project ID |
 | `NEXT_PUBLIC_SANITY_DATASET` | `production` | Default dataset |
 | `SANITY_API_TOKEN` | (from Step 3) | Sanity API token with write access |
 | `NEXT_PUBLIC_SITE_URL` | `https://kushsavvy.com` | Your domain |
 | `RESEND_API_KEY` | (from Step 4) | Resend API key |
+| `UPSTASH_REDIS_REST_URL` | `https://...upstash.io` | Redis for rate limiting + insight cache |
+| `UPSTASH_REDIS_REST_TOKEN` | `AX...` | Redis token |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | (from Cloudflare) | Optional: CAPTCHA for site tools |
+| `TURNSTILE_SECRET_KEY` | (from Cloudflare) | Optional: CAPTCHA verification |
 
 After adding all variables, **redeploy** for them to take effect:
 ```bash
@@ -139,3 +144,26 @@ After deployment, verify these work:
 - [ ] Newsletter signup form submits
 - [ ] Sitemap accessible at /sitemap.xml
 - [ ] robots.txt accessible at /robots.txt
+
+## Extension API Endpoints
+
+These endpoints serve the Chrome extension (no CORS restrictions needed — extension makes same-origin requests to KushSavvy.com):
+
+| Endpoint | Method | Notes |
+|----------|--------|-------|
+| `/api/extension/insights` | POST | Main AI insight endpoint — GPT-4o Mini (Tier 1) |
+| `/api/extension/coa` | POST | COA analysis — Claude Sonnet (Tier 2) |
+| `/api/extension/affiliates` | GET | Affiliate link generation — no AI |
+
+## Extension Build (Chrome Web Store)
+
+The Chrome extension source lives in `/extension/`. To build:
+
+```bash
+cd extension
+npm install
+npm run build
+# Output in extension/dist/ — upload as .zip to Chrome Web Store
+```
+
+See `/extension/manifest.json` for full permission declarations.
