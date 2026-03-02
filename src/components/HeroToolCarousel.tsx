@@ -46,11 +46,11 @@ export default function HeroToolCarousel({ tools }: { tools: Tool[] }) {
 
   return (
     <div
-      className="mt-12 max-w-md mx-auto"
+      className="mt-14 max-w-md mx-auto"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <p className="text-text-tertiary text-xs uppercase tracking-wider mb-3 font-mono">
+      <p className="text-gray-500 text-xs uppercase tracking-[0.15em] mb-3 font-mono">
         Explore our tools
       </p>
       <div className="relative">
@@ -58,7 +58,7 @@ export default function HeroToolCarousel({ tools }: { tools: Tool[] }) {
         <button
           onClick={prev}
           aria-label="Previous tool"
-          className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-surface/80 border border-border flex items-center justify-center text-text-tertiary hover:text-accent-green hover:border-accent-green transition-colors"
+          className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full glass flex items-center justify-center text-gray-500 hover:text-accent-green-light hover:border-accent-green/30 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -67,7 +67,7 @@ export default function HeroToolCarousel({ tools }: { tools: Tool[] }) {
         <button
           onClick={next}
           aria-label="Next tool"
-          className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-surface/80 border border-border flex items-center justify-center text-text-tertiary hover:text-accent-green hover:border-accent-green transition-colors"
+          className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full glass flex items-center justify-center text-gray-500 hover:text-accent-green-light hover:border-accent-green/30 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -78,22 +78,24 @@ export default function HeroToolCarousel({ tools }: { tools: Tool[] }) {
         <Link
           href={`/tools/${tool.slug}`}
           key={tool.slug}
-          className="group block rounded-card border border-border bg-surface/60 backdrop-blur-sm px-6 py-5 transition-all hover:shadow-md hover:border-accent-green/30 animate-in fade-in duration-300"
+          className="group block rounded-2xl glass gradient-border px-6 py-5 transition-all hover:bg-white/[0.06]"
         >
           <div className="flex items-center gap-4">
-            <span className="text-3xl flex-shrink-0" aria-hidden="true">
-              {tool.icon}
-            </span>
+            <div className="w-12 h-12 rounded-xl bg-accent-green/10 flex items-center justify-center flex-shrink-0 group-hover:bg-accent-green/15 transition-colors">
+              <span className="text-2xl" aria-hidden="true">
+                {tool.icon}
+              </span>
+            </div>
             <div className="text-left min-w-0">
-              <h3 className="font-heading text-base font-semibold text-text-primary group-hover:text-accent-green transition-colors truncate">
+              <h3 className="font-heading text-base font-semibold text-white group-hover:text-accent-green-light transition-colors truncate">
                 {tool.title}
               </h3>
-              <p className="text-text-secondary text-sm leading-snug line-clamp-1">
+              <p className="text-gray-500 text-sm leading-snug line-clamp-1">
                 {tool.description}
               </p>
             </div>
             <svg
-              className="w-5 h-5 text-text-tertiary group-hover:text-accent-green transition-colors flex-shrink-0 ml-auto"
+              className="w-5 h-5 text-gray-600 group-hover:text-accent-green-light group-hover:translate-x-0.5 transition-all flex-shrink-0 ml-auto"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -111,10 +113,10 @@ export default function HeroToolCarousel({ tools }: { tools: Tool[] }) {
             key={i}
             onClick={() => setActive(i)}
             aria-label={`Go to tool ${i + 1}`}
-            className={`w-1.5 h-1.5 rounded-full transition-all ${
+            className={`h-1.5 rounded-full transition-all duration-300 ${
               i === active
-                ? "bg-accent-green w-4"
-                : "bg-text-tertiary/30 hover:bg-text-tertiary/50"
+                ? "bg-accent-green w-5"
+                : "bg-gray-600 w-1.5 hover:bg-gray-500"
             }`}
           />
         ))}

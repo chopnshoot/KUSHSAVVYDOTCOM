@@ -7,25 +7,36 @@ body {
   background: #FAFAF8;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  ::selection {
+    background-color: rgba(45, 106, 79, 0.2);
+    color: #1A1A1A;
+  }
+}
+
 @layer components {
   .card {
-    @apply bg-surface border border-border rounded-card transition-shadow duration-200 hover:shadow-md;
+    @apply bg-surface border border-border rounded-card transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5;
   }
 
   .btn-primary {
-    @apply bg-accent-green text-white px-6 py-3 rounded-lg font-body font-medium transition-colors duration-200 hover:bg-accent-green-light;
+    @apply bg-accent-green text-white px-6 py-3 rounded-xl font-body font-semibold transition-all duration-300 hover:bg-accent-green-light hover:shadow-lg hover:shadow-accent-green/25 active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply border border-accent-green text-accent-green px-6 py-3 rounded-lg font-body font-medium transition-colors duration-200 hover:bg-accent-green hover:text-white;
+    @apply border-2 border-accent-green text-accent-green px-6 py-3 rounded-xl font-body font-semibold transition-all duration-300 hover:bg-accent-green hover:text-white hover:shadow-lg hover:shadow-accent-green/25 active:scale-[0.98];
   }
 
   .btn-warm {
-    @apply bg-warm text-white px-6 py-3 rounded-lg font-body font-medium transition-colors duration-200 hover:opacity-90;
+    @apply bg-warm text-white px-6 py-3 rounded-xl font-body font-semibold transition-all duration-300 hover:opacity-90 hover:shadow-lg hover:shadow-warm/25 active:scale-[0.98];
   }
 
   .tag {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-body bg-tag-bg text-text-secondary;
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-body font-medium bg-tag-bg text-text-secondary;
   }
 
   .tag-indica {
@@ -45,7 +56,7 @@ body {
   }
 
   .section-heading {
-    @apply font-heading text-3xl md:text-4xl text-text-primary;
+    @apply font-heading text-3xl md:text-4xl text-text-primary tracking-tight;
   }
 
   .result-card-indica {
@@ -65,4 +76,143 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* ── Hero dark section ─────────────────────────────────── */
+.hero-dark {
+  background: linear-gradient(160deg, #0C1510 0%, #152B1E 35%, #1A3326 55%, #0F1D15 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(45, 106, 79, 0.18), transparent);
+  pointer-events: none;
+}
+
+.hero-dark::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 40% at 85% 100%, rgba(212, 163, 115, 0.06), transparent);
+  pointer-events: none;
+}
+
+/* Grid overlay for hero */
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(45, 106, 79, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 106, 79, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black, transparent);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black, transparent);
+  pointer-events: none;
+}
+
+.glow-green {
+  text-shadow: 0 0 60px rgba(45, 106, 79, 0.4);
+}
+
+/* ── Animations ────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.7s ease-out both;
+}
+
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-300 { animation-delay: 300ms; }
+.animate-delay-400 { animation-delay: 400ms; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ── Glass card ────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ── Gradient border effect ────────────────────────────── */
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(45, 106, 79, 0.5), rgba(212, 163, 115, 0.2), rgba(45, 106, 79, 0.1));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+}
+
+/* ── Tool icon wrap ────────────────────────────────────── */
+.tool-icon-wrap {
+  background: linear-gradient(135deg, #E8F5E9, #F1F8E9);
+  border: 1px solid rgba(45, 106, 79, 0.1);
+  border-radius: 16px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.group:hover .tool-icon-wrap {
+  background: linear-gradient(135deg, #D4EDDA, #E8F5E9);
+  border-color: rgba(45, 106, 79, 0.2);
+  transform: scale(1.08) rotate(-2deg);
+}
+
+/* ── Newsletter gradient ───────────────────────────────── */
+.newsletter-gradient {
+  background: linear-gradient(160deg, #0C1510 0%, #152B1E 50%, #1A3326 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.newsletter-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 50% at 20% 50%, rgba(45, 106, 79, 0.1), transparent);
+  pointer-events: none;
+}
+
+/* ── Section divider ───────────────────────────────────── */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #E8E8E4, transparent);
+}
+
+/* ── Stat gradient text ────────────────────────────────── */
+.stat-highlight {
+  background: linear-gradient(135deg, #2D6A4F, #40916C);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

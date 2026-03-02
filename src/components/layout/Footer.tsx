@@ -49,43 +49,51 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-surface border-t border-border">
-      {/* Newsletter Section */}
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-12 rounded-card bg-tag-bg px-6 py-8 sm:px-10 sm:py-10">
+    <footer>
+      {/* Newsletter Section — dark, rich treatment */}
+      <div className="newsletter-gradient">
+        <div className="relative mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20 text-center">
+          <p className="text-accent-green/70 font-mono text-xs uppercase tracking-[0.2em] mb-4">
+            Stay Informed
+          </p>
           <NewsletterSignup />
         </div>
+      </div>
 
-        {/* Link Columns */}
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
-          {footerLinkGroups.map((group) => (
-            <div key={group.title}>
-              <h3 className="font-heading text-sm font-semibold text-text-primary">
-                {group.title}
-              </h3>
-              <ul className="mt-4 space-y-3">
-                {group.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="font-body text-sm text-text-secondary hover:text-accent-green transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+      {/* Footer links */}
+      <div className="bg-surface border-t border-border">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          {/* Link Columns */}
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+            {footerLinkGroups.map((group) => (
+              <div key={group.title}>
+                <h3 className="font-heading text-sm font-semibold text-text-primary">
+                  {group.title}
+                </h3>
+                <ul className="mt-4 space-y-3">
+                  {group.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="font-body text-sm text-text-secondary hover:text-accent-green transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
 
-        {/* Copyright */}
-        <div className="mt-12 border-t border-border pt-8 flex flex-col items-center gap-4">
-          <Logo size="sm" />
-          <p className="font-body text-sm text-text-secondary text-center">
-            &copy; {currentYear} KushSavvy. All rights reserved. For
-            educational purposes only. Not medical advice.
-          </p>
+          {/* Copyright */}
+          <div className="mt-12 border-t border-border pt-8 flex flex-col items-center gap-4">
+            <Logo size="sm" />
+            <p className="font-body text-sm text-text-tertiary text-center">
+              &copy; {currentYear} KushSavvy. All rights reserved. For
+              educational purposes only. Not medical advice.
+            </p>
+          </div>
         </div>
       </div>
     </footer>

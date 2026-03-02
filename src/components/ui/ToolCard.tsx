@@ -17,10 +17,10 @@ export default function ToolCard({
 }: ToolCardProps) {
   const cardContent = (
     <div
-      className={`group relative flex flex-col gap-4 rounded-card border border-border bg-surface p-6 transition-shadow ${
+      className={`group relative flex flex-col gap-4 rounded-2xl border bg-surface p-6 transition-all duration-300 ${
         available
-          ? "hover:shadow-md cursor-pointer"
-          : "opacity-75 cursor-default"
+          ? "border-border hover:shadow-lg hover:-translate-y-1 hover:border-accent-green/20 cursor-pointer"
+          : "opacity-70 cursor-default border-border"
       }`}
     >
       {/* Coming Soon Badge */}
@@ -31,9 +31,11 @@ export default function ToolCard({
       )}
 
       {/* Icon */}
-      <span className="text-3xl" role="img" aria-hidden="true">
-        {icon}
-      </span>
+      <div className="tool-icon-wrap">
+        <span className="text-2xl" role="img" aria-hidden="true">
+          {icon}
+        </span>
+      </div>
 
       {/* Title */}
       <h3
@@ -54,12 +56,12 @@ export default function ToolCard({
       {/* Arrow indicator for available tools */}
       {available && (
         <span
-          className="mt-auto inline-flex items-center font-body text-sm font-medium text-accent-green opacity-0 transition-opacity group-hover:opacity-100"
+          className="mt-auto inline-flex items-center font-body text-sm font-semibold text-accent-green opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-1"
           aria-hidden="true"
         >
           Explore tool
           <svg
-            className="ml-1 h-4 w-4"
+            className="ml-1.5 h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={2}
