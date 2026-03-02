@@ -1,17 +1,16 @@
 import { createClient } from "@sanity/client";
 import imageUrlBuilder from "@sanity/image-url";
+import { projectId, dataset, apiVersion } from "@/sanity/env";
 import { seedTerpenes, SeedTerpene } from "./seed-terpenes";
 import { seedStateLaws, SeedStateLaw } from "./seed-states";
 import { seedArticles, SeedArticle, slugifyArticle } from "./seed-articles";
 
 // ─── Client ───────────────────────────────────────────────────────────────────
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "";
-
 export const client = createClient({
   projectId,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || "production",
-  apiVersion: "2024-01-01",
+  dataset,
+  apiVersion,
   useCdn: true,
 });
 
@@ -23,7 +22,7 @@ export function urlFor(source: unknown) {
 }
 
 /** true when a project ID is configured so we can attempt Sanity queries */
-const sanityConfigured = projectId.length > 0;
+const sanityConfigured = projectId.length > 0 && projectId !== "undefined";
 
 // ─── Terpenes ─────────────────────────────────────────────────────────────────
 
