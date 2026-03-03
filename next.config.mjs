@@ -11,6 +11,14 @@ const nextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/studio/:path*",
+        destination: "/studio",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
