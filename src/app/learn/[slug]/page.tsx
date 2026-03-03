@@ -90,11 +90,12 @@ export default async function ArticlePage({
   const article = await getArticleBySlug(params.slug);
   if (!article) notFound();
 
-  const elements = renderMarkdown(article.body);
-  const wordCount = article.body.split(/\s+/).length;
+  const body = typeof article.body === "string" ? article.body : "";
+  const elements = renderMarkdown(body);
+  const wordCount = body.split(/\s+/).filter(Boolean).length;
   const readTime = Math.ceil(wordCount / 250);
 
-  const relatedTools = article.relatedTools
+  const relatedTools = (article.relatedTools || [])
     .map((slug) => tools.find((t) => t.slug === slug))
     .filter(Boolean);
 
@@ -209,7 +210,7 @@ export default async function ArticlePage({
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mt-10 pt-6 border-t border-border">
-          {article.tags.map((tag) => (
+          {(article.tags || []).map((tag) => (
             <span key={tag} className="tag text-xs">
               {tag}
             </span>
