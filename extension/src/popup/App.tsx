@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getPreferences, checkLocalRateLimit } from "../lib/storage";
-import type { UserPreferences } from "../lib/types";
+import { getUserProfile, checkLocalRateLimit } from "../lib/storage";
+import type { UserProfile } from "../lib/types";
 
 const s = {
   container: { padding: 16 },
@@ -71,19 +71,35 @@ const s = {
     marginBottom: 10,
     padding: 0,
   },
+  experienceBadge: (level: string) => {
+    const map: Record<string, string> = {
+      new: "#f0fdf4",
+      casual: "#fffbeb",
+      weekly: "#fff7ed",
+      daily: "#fef2f2",
+    };
+    return {
+      display: "inline-block",
+      padding: "2px 8px",
+      borderRadius: 10,
+      background: map[level] ?? "#f5f5f5",
+      fontSize: 11,
+      fontWeight: 600,
+    };
+  },
 };
 
 export function PopupApp() {
-  const [prefs, setPrefs] = useState<UserPreferences | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [remaining, setRemaining] = useState<number>(50);
 
   useEffect(() => {
     async function load() {
       const [p, rateLimit] = await Promise.all([
-        getPreferences(),
+        getUserProfile(),
         checkLocalRateLimit(),
       ]);
-      setPrefs(p);
+      setProfile(p);
       setRemaining(rateLimit.remaining);
     }
     load().catch(console.error);
@@ -105,6 +121,10 @@ export function PopupApp() {
     window.close();
   }
 
+  const favCount = profile?.favorites?.length ?? 0;
+  const sessionCount = profile?.sessions_count ?? 0;
+  const feedbackCount = profile?.feedback_count ?? 0;
+
   return (
     <div style={s.container}>
       <div style={s.header}>
@@ -118,21 +138,34 @@ export function PopupApp() {
         Open Insight Panel
       </button>
 
-      {prefs?.onboardingComplete && (
+      {profile?.onboardingComplete && (
         <div style={s.statsRow}>
           <div style={s.statBox}>
             <span style={s.statNum}>{remaining}</span>
             <span style={s.statLabel}>insights left today</span>
           </div>
           <div style={s.statBox}>
-            <span style={s.statNum}>
-              {prefs.experienceLevel === "new"
-                ? "New"
-                : prefs.experienceLevel.charAt(0).toUpperCase() +
-                  prefs.experienceLevel.slice(1)}
-            </span>
-            <span style={s.statLabel}>experience</span>
+            <span style={s.statNum}>{favCount}</span>
+            <span style={s.statLabel}>saved strains</span>
           </div>
+          <div style={s.statBox}>
+            <span style={s.statNum}>{feedbackCount > 0 ? feedbackCount : sessionCount}</span>
+            <span style={s.statLabel}>{feedbackCount > 0 ? "ratings" : "sessions"}</span>
+          </div>
+        </div>
+      )}
+
+      {profile?.onboardingComplete && (
+        <div style={{ textAlign: "center", marginBottom: 10, fontSize: 12, color: "#555" }}>
+          Experience:{" "}
+          <span style={s.experienceBadge(profile.experience_level)}>
+            {profile.experience_level.charAt(0).toUpperCase() + profile.experience_level.slice(1)}
+          </span>
+          {"  "}
+          Potency:{" "}
+          <span style={s.experienceBadge(profile.potency_preference)}>
+            {profile.potency_preference.replace("_", " ")}
+          </span>
         </div>
       )}
 

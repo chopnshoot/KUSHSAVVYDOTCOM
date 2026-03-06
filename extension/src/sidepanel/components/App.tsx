@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
-import type { ProductData, InsightResponse, UserPreferences } from "../../lib/types";
+import type { ProductData, StrainProfile, PuffOrPassScore, UserProfile } from "../../lib/types";
 import {
-  getPreferences,
+  getUserProfile,
+  saveUserProfile,
   isAgeVerified,
-  getCachedInsight,
-  setCachedInsight,
+  getCachedStrainProfile,
+  setCachedStrainProfile,
   checkLocalRateLimit,
 } from "../../lib/storage";
-import { fetchInsight, fetchStrainLookup } from "../../lib/api";
+import { fetchInsight, fetchStrainLookup, sendPageCapture } from "../../lib/api";
+import { restoreProfileFromServer } from "../../lib/profileSync";
 import { OnboardingFlow } from "./OnboardingFlow";
 import { InsightPanel } from "./InsightPanel";
 import { LoadingState } from "./LoadingState";
@@ -71,6 +73,7 @@ const styles = {
     fontSize: 14,
     outline: "none",
     fontFamily: "inherit",
+    boxSizing: "border-box" as const,
   },
   searchBtn: {
     width: "100%",
@@ -119,8 +122,10 @@ type AppState =
 export function App() {
   const [appState, setAppState] = useState<AppState>("checking");
   const [product, setProduct] = useState<ProductData | null>(null);
-  const [insight, setInsight] = useState<InsightResponse | null>(null);
-  const [preferences, setPreferences] = useState<UserPreferences | null>(null);
+  const [strainProfile, setStrainProfile] = useState<StrainProfile | null>(null);
+  const [puffOrPassScore, setPuffOrPassScore] = useState<PuffOrPassScore | null>(null);
+  const [canonicalProductId, setCanonicalProductId] = useState<string | undefined>();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [manualQuery, setManualQuery] = useState("");
   const [isRateLimited, setIsRateLimited] = useState(false);
@@ -129,33 +134,41 @@ export function App() {
 
   useEffect(() => {
     async function init() {
-      const [verified, prefs] = await Promise.all([isAgeVerified(), getPreferences()]);
+      const [verified, profile] = await Promise.all([isAgeVerified(), getUserProfile()]);
 
       if (!verified) {
         setAppState("age-gate");
         return;
       }
 
-      if (!prefs?.onboardingComplete) {
+      if (!profile?.onboardingComplete) {
+        // Try restoring from server (reinstall recovery)
+        const restored = await restoreProfileFromServer().catch(() => null);
+        if (restored?.onboardingComplete) {
+          await saveUserProfile(restored);
+          setUserProfile(restored);
+          setAppState("empty");
+          return;
+        }
         setAppState("onboarding");
         return;
       }
 
-      setPreferences(prefs);
+      setUserProfile(profile);
       setAppState("empty");
 
-      // Check for pending lookup (from context menu)
-      const session = await chrome.storage.session.get("pendingLookup");
-      if (session.pendingLookup) {
-        await chrome.storage.session.remove("pendingLookup");
-        handleStrainLookup(session.pendingLookup as string);
+      // Check for pending highlight lookup (from context menu)
+      const session = await chrome.storage.session.get("pendingLookup").catch(() => ({}));
+      if ((session as Record<string, unknown>).pendingLookup) {
+        await chrome.storage.session.remove("pendingLookup").catch(() => {});
+        handleStrainLookup((session as Record<string, unknown>).pendingLookup as string);
       }
     }
 
     init().catch(console.error);
   }, []);
 
-  // ─── Message Listener (from content script / service worker) ─────────────
+  // ─── Message Listener ─────────────────────────────────────────────────────
 
   useEffect(() => {
     function handleMessage(message: { type: string; payload?: unknown }) {
@@ -170,7 +183,7 @@ export function App() {
 
     chrome.runtime.onMessage.addListener(handleMessage);
     return () => chrome.runtime.onMessage.removeListener(handleMessage);
-  }, [preferences]);
+  }, [userProfile]);
 
   // ─── Product Detection Handler ────────────────────────────────────────────
 
@@ -179,12 +192,19 @@ export function App() {
       if (appState === "loading") return;
 
       setProduct(detectedProduct);
+      setPuffOrPassScore(null);
+      setCanonicalProductId(undefined);
 
-      // Check local cache first
-      const cached = await getCachedInsight(detectedProduct.name, detectedProduct.category);
+      // Check local cache for StrainProfile
+      const cached = await getCachedStrainProfile(detectedProduct.name, detectedProduct.category);
       if (cached) {
-        setInsight(cached.data);
+        setStrainProfile(cached.data);
         setAppState("result");
+        // Still send page capture in background to get personalized score
+        sendPageCapture(detectedProduct).then((res) => {
+          if (res.score) setPuffOrPassScore(res.score);
+          if (res.canonical_product_id) setCanonicalProductId(res.canonical_product_id);
+        }).catch(() => {});
         return;
       }
 
@@ -199,10 +219,17 @@ export function App() {
       setAppState("loading");
       setError(null);
 
+      // Fire page capture (non-blocking) — gets canonical_product_id + personalized score
+      sendPageCapture(detectedProduct).then((res) => {
+        if (res.score) setPuffOrPassScore(res.score);
+        if (res.canonical_product_id) setCanonicalProductId(res.canonical_product_id);
+      }).catch(() => {});
+
+      // Fetch AI strain profile
       try {
-        const result = await fetchInsight(detectedProduct);
-        await setCachedInsight(detectedProduct.name, detectedProduct.category, result);
-        setInsight(result);
+        const profile = await fetchInsight(detectedProduct);
+        await setCachedStrainProfile(detectedProduct.name, detectedProduct.category, profile);
+        setStrainProfile(profile);
         setAppState("result");
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Failed to get insights";
@@ -210,7 +237,7 @@ export function App() {
         setAppState("error");
       }
     },
-    [appState, preferences]
+    [appState, userProfile]
   );
 
   // ─── Manual Strain Lookup ─────────────────────────────────────────────────
@@ -228,10 +255,13 @@ export function App() {
       setAppState("loading");
       setError(null);
       setManualQuery(strainName);
+      setProduct(null);
+      setPuffOrPassScore(null);
+      setCanonicalProductId(undefined);
 
       try {
-        const result = await fetchStrainLookup(strainName);
-        setInsight(result);
+        const profile = await fetchStrainLookup(strainName);
+        setStrainProfile(profile);
         setAppState("result");
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Failed to get insights";
@@ -239,13 +269,13 @@ export function App() {
         setAppState("error");
       }
     },
-    [preferences]
+    [userProfile]
   );
 
   // ─── Onboarding Complete ──────────────────────────────────────────────────
 
-  const handleOnboardingComplete = useCallback((prefs: UserPreferences) => {
-    setPreferences(prefs);
+  const handleOnboardingComplete = useCallback((profile: UserProfile) => {
+    setUserProfile(profile);
     setAppState("empty");
   }, []);
 
@@ -284,9 +314,11 @@ export function App() {
             style={styles.homeBtn}
             onClick={() => {
               setAppState("empty");
-              setInsight(null);
+              setStrainProfile(null);
+              setPuffOrPassScore(null);
               setProduct(null);
               setError(null);
+              setCanonicalProductId(undefined);
             }}
             title="Back to home"
           >
@@ -320,11 +352,13 @@ export function App() {
       )}
 
       {/* Result */}
-      {appState === "result" && insight && (
+      {appState === "result" && strainProfile && (
         <InsightPanel
           product={product}
-          insight={insight}
-          preferences={preferences}
+          insight={strainProfile}
+          puffOrPassScore={puffOrPassScore}
+          userProfile={userProfile}
+          canonicalProductId={canonicalProductId}
         />
       )}
 

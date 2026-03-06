@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import type { ProductData, InsightResponse, UserPreferences } from "../../lib/types";
+import React from "react";
+import type { ProductData, StrainProfile, PuffOrPassScore, UserProfile } from "../../lib/types";
 import { EffectsSection } from "./EffectsSection";
 import { TerpenesSection } from "./TerpenesSection";
 import { DosingSection } from "./DosingSection";
-import { MatchScore } from "./MatchScore";
 import { SimilarStrains } from "./SimilarStrains";
 import { TrustSignal } from "./TrustSignal";
+import { VerdictBlock } from "./VerdictBlock";
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -25,7 +25,7 @@ const s = {
     fontSize: 16,
     fontWeight: 700,
     color: "#1a1a1a",
-    margin: "0 0 4px",
+    margin: "0 0 6px",
   },
   productMeta: {
     display: "flex",
@@ -42,6 +42,23 @@ const s = {
     color: "#fff",
     whiteSpace: "nowrap" as const,
   }),
+  potencyBadge: (level: string) => {
+    const colors: Record<string, { bg: string; color: string }> = {
+      mild: { bg: "#f0fdf4", color: "#166534" },
+      moderate: { bg: "#fffbeb", color: "#92400e" },
+      strong: { bg: "#fff7ed", color: "#c2410c" },
+      very_strong: { bg: "#fef2f2", color: "#b91c1c" },
+    };
+    const c = colors[level] ?? { bg: "#f5f5f5", color: "#555" };
+    return {
+      padding: "2px 8px",
+      borderRadius: 12,
+      fontSize: 11,
+      fontWeight: 600,
+      background: c.bg,
+      color: c.color,
+    };
+  },
   thcBadge: {
     padding: "2px 8px",
     borderRadius: 12,
@@ -51,38 +68,27 @@ const s = {
     color: "#166534",
     border: "1px solid #bbf7d0",
   },
+  dispensary: {
+    fontSize: 11,
+    color: "#888",
+  },
   actions: {
     display: "flex",
     gap: 8,
-    padding: "10px 16px",
+    padding: "8px 16px",
     borderBottom: "1px solid #f0f0ec",
     background: "#fafaf8",
   },
   actionBtn: {
     flex: 1,
-    padding: "7px 10px",
+    padding: "6px 10px",
     border: "1px solid #ddd",
     borderRadius: 6,
     background: "#fff",
-    fontSize: 12,
+    fontSize: 11,
     cursor: "pointer",
     fontFamily: "inherit",
     color: "#333",
-    textAlign: "center" as const,
-    textDecoration: "none",
-    display: "block",
-  },
-  actionBtnGreen: {
-    flex: 1,
-    padding: "7px 10px",
-    border: "1px solid #2D6A4F",
-    borderRadius: 6,
-    background: "#2D6A4F",
-    fontSize: 12,
-    fontWeight: 600,
-    cursor: "pointer",
-    fontFamily: "inherit",
-    color: "#fff",
     textAlign: "center" as const,
     textDecoration: "none",
     display: "block",
@@ -98,25 +104,6 @@ const s = {
     color: "#aaa",
     borderTop: "1px solid #f0f0ec",
   },
-  feedbackRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    padding: "10px 16px",
-    background: "#fafaf8",
-    borderTop: "1px solid #f0f0ec",
-    fontSize: 12,
-    color: "#666",
-  },
-  thumbBtn: (active: boolean) => ({
-    background: active ? "#f0fdf4" : "none",
-    border: active ? "1px solid #bbf7d0" : "1px solid #e5e5e5",
-    borderRadius: 6,
-    padding: "4px 10px",
-    cursor: "pointer",
-    fontSize: 16,
-  }),
 };
 
 // ─── Strain type colors ───────────────────────────────────────────────────────
@@ -127,23 +114,32 @@ const strainColors: Record<string, string> = {
   hybrid: "#7c3aed",
 };
 
+const potencyLabels: Record<string, string> = {
+  mild: "Mild",
+  moderate: "Moderate",
+  strong: "Strong",
+  very_strong: "Very Strong",
+};
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface InsightPanelProps {
   product: ProductData | null;
-  insight: InsightResponse;
-  preferences: UserPreferences | null;
+  insight: StrainProfile;
+  puffOrPassScore: PuffOrPassScore | null;
+  userProfile: UserProfile | null;
+  canonicalProductId?: string;
 }
 
-export function InsightPanel({ product, insight, preferences }: InsightPanelProps) {
-  const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
-
+export function InsightPanel({
+  product,
+  insight,
+  puffOrPassScore,
+  userProfile,
+  canonicalProductId,
+}: InsightPanelProps) {
   const name = product?.name ?? "This strain";
-  const dispensary = product?.dispensary;
-  const source = product?.source;
-  const thc = product?.thc;
-  const cbd = product?.cbd;
-  const strainType = product?.strainType;
+  const strainKey = `${name.toLowerCase().replace(/\s+/g, "_")}:${product?.category ?? "unknown"}`;
 
   const weedmapsLink = insight.similar?.[0]?.affiliateLink;
 
@@ -153,62 +149,81 @@ export function InsightPanel({ product, insight, preferences }: InsightPanelProp
       <div style={s.productHeader}>
         <h2 style={s.productName}>{name}</h2>
         <div style={s.productMeta}>
-          {strainType && (
-            <span style={s.badge(strainColors[strainType] ?? "#555")}>
-              {strainType.charAt(0).toUpperCase() + strainType.slice(1)}
+          {product?.strainType && (
+            <span style={s.badge(strainColors[product.strainType] ?? "#555")}>
+              {product.strainType.charAt(0).toUpperCase() + product.strainType.slice(1)}
             </span>
           )}
-          {thc && <span style={s.thcBadge}>THC {thc}</span>}
-          {cbd && <span style={s.thcBadge}>CBD {cbd}</span>}
-          {dispensary && (
-            <span style={{ fontSize: 11, color: "#888" }}>@ {dispensary}</span>
+          {insight.potencyLevel && (
+            <span style={s.potencyBadge(insight.potencyLevel)}>
+              {potencyLabels[insight.potencyLevel] ?? insight.potencyLevel}
+            </span>
+          )}
+          {product?.thc && <span style={s.thcBadge}>THC {product.thc}</span>}
+          {product?.cbd && <span style={s.thcBadge}>CBD {product.cbd}</span>}
+          {product?.dispensary && (
+            <span style={s.dispensary}>@ {product.dispensary}</span>
           )}
         </div>
       </div>
 
-      {/* Actions */}
-      <div style={s.actions}>
-        {weedmapsLink && (
-          <a
-            href={weedmapsLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={s.actionBtnGreen}
-          >
-            🔍 Find Nearby
-          </a>
-        )}
-        {insight.shareUrl && (
-          <a
-            href={`https://kushsavvy.com${insight.shareUrl}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={s.actionBtn}
-          >
-            🔗 Share
-          </a>
-        )}
-        {product?.coaLink && (
-          <a
-            href={product.coaLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={s.actionBtn}
-          >
-            📋 View COA
-          </a>
-        )}
-      </div>
+      {/* Puff or Pass Verdict — verdict-first layout */}
+      <VerdictBlock
+        score={puffOrPassScore}
+        userProfile={userProfile}
+        strainKey={strainKey}
+        strainName={name}
+        category={product?.category ?? "unknown"}
+        strainType={product?.strainType}
+        effectTags={insight.effectTags ?? []}
+        terpeneTags={insight.terpeneTags ?? []}
+        potencyLevel={insight.potencyLevel ?? "moderate"}
+        dispensary={product?.dispensary}
+        price={product?.price}
+        productUrl={product?.productUrl}
+        canonical_product_id={canonicalProductId}
+      />
 
-      {/* Sections */}
+      {/* Quick actions */}
+      {(weedmapsLink || product?.coaLink) && (
+        <div style={s.actions}>
+          {weedmapsLink && (
+            <a
+              href={weedmapsLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={s.actionBtn}
+            >
+              🔍 Find Nearby
+            </a>
+          )}
+          {product?.coaLink && (
+            <a
+              href={product.coaLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={s.actionBtn}
+            >
+              📋 Lab Report
+            </a>
+          )}
+          {insight.shareUrl && (
+            <a
+              href={`https://kushsavvy.com${insight.shareUrl}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={s.actionBtn}
+            >
+              🔗 Share
+            </a>
+          )}
+        </div>
+      )}
+
+      {/* Content sections */}
       <div style={s.sections}>
-        {/* Trust Signal — top of page, most important */}
+        {/* Trust signal */}
         <TrustSignal signal={insight.trustSignal} />
-
-        {/* Match Score — personal, show early */}
-        {insight.matchScore && (
-          <MatchScore score={insight.matchScore} />
-        )}
 
         {/* Effects */}
         <EffectsSection effects={insight.effects} />
@@ -219,17 +234,10 @@ export function InsightPanel({ product, insight, preferences }: InsightPanelProp
         {/* Dosing */}
         <DosingSection dosing={insight.dosing} productType={product?.category} />
 
-        {/* Similar Strains */}
-        {insight.similar.length > 0 && (
+        {/* Similar strains */}
+        {insight.similar && insight.similar.length > 0 && (
           <SimilarStrains strains={insight.similar} />
         )}
-      </div>
-
-      {/* Feedback */}
-      <div style={s.feedbackRow}>
-        <span>Was this helpful?</span>
-        <button style={s.thumbBtn(feedback === "up")} onClick={() => setFeedback("up")}>👍</button>
-        <button style={s.thumbBtn(feedback === "down")} onClick={() => setFeedback("down")}>👎</button>
       </div>
 
       {/* Footer */}
@@ -249,12 +257,10 @@ export function InsightPanel({ product, insight, preferences }: InsightPanelProp
           rel="noopener noreferrer"
           style={{ color: "#aaa", textDecoration: "none" }}
         >
-          Learn about terpenes
+          Terpene Guide
         </a>
         {" · "}
-        <span style={{ color: "#ccc" }}>
-          {insight.cached ? "cached" : "live"}
-        </span>
+        <span style={{ color: "#ccc" }}>{insight.cached ? "cached" : "live"}</span>
       </div>
     </div>
   );

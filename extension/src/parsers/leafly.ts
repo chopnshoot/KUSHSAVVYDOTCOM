@@ -1,183 +1,162 @@
 import type { ProductData } from "../lib/types";
 
-// Leafly product/strain page parser
-// Targets: leafly.com/dispensary-info/*/menu/* and leafly.com/products/*
-
 function normalizeCategory(raw: string): ProductData["category"] {
   const lower = raw.toLowerCase();
-  if (lower.includes("flower")) return "flower";
-  if (lower.includes("vape") || lower.includes("cartridge") || lower.includes("pen")) return "vape";
-  if (lower.includes("edible") || lower.includes("gummy") || lower.includes("chocolate") || lower.includes("drink")) return "edible";
-  if (lower.includes("concentrate") || lower.includes("wax") || lower.includes("shatter") || lower.includes("live") || lower.includes("rosin")) return "concentrate";
+  if (lower.includes("flower") || lower.includes("bud")) return "flower";
+  if (lower.includes("vape") || lower.includes("cartridge") || lower.includes("cart")) return "vape";
+  if (lower.includes("edible") || lower.includes("gummy") || lower.includes("chocolate")) return "edible";
+  if (lower.includes("concentrate") || lower.includes("wax") || lower.includes("shatter") || lower.includes("rosin")) return "concentrate";
   if (lower.includes("pre-roll") || lower.includes("preroll") || lower.includes("joint")) return "preroll";
   if (lower.includes("tincture")) return "tincture";
-  if (lower.includes("topical") || lower.includes("lotion") || lower.includes("balm")) return "topical";
+  if (lower.includes("topical")) return "topical";
   return "unknown";
 }
 
-function normalizeStrainType(raw: string): ProductData["strainType"] | undefined {
-  const lower = raw.toLowerCase();
-  if (lower.includes("sativa")) return "sativa";
-  if (lower.includes("indica")) return "indica";
-  if (lower.includes("hybrid")) return "hybrid";
-  return undefined;
+function extractPercentageNum(text: string): number | undefined {
+  const match = text.match(/(\d+(?:\.\d+)?)\s*%/);
+  return match ? parseFloat(match[1]) : undefined;
 }
 
 function tryText(selector: string, root: Document | Element = document): string {
   return root.querySelector(selector)?.textContent?.trim() ?? "";
 }
 
-function extractPercentage(text: string): string | undefined {
-  const match = text.match(/(\d+(?:\.\d+)?)\s*%/);
-  return match ? `${match[1]}%` : undefined;
-}
-
-// Try to get JSON-LD structured data first (most reliable)
-function parseFromJsonLD(): Partial<ProductData> | null {
+function parseJsonLd(): Partial<ProductData> {
   const scripts = document.querySelectorAll('script[type="application/ld+json"]');
   for (const script of scripts) {
     try {
-      const data = JSON.parse(script.textContent ?? "{}");
-      const item = Array.isArray(data) ? data[0] : data;
-      if (item["@type"] === "Product" || item.name) {
+      const data = JSON.parse(script.textContent ?? "");
+      const product = data["@type"] === "Product" ? data : data["@graph"]?.find((g: { "@type": string }) => g["@type"] === "Product");
+      if (product) {
         return {
-          name: item.name,
-          brand: item.brand?.name,
-          rawDescription: item.description,
+          name: product.name,
+          brand: product.brand?.name,
+          rawDescription: product.description?.slice(0, 500),
         };
       }
-    } catch {
-      // Continue
-    }
+    } catch { /* skip */ }
   }
-  return null;
+  return {};
+}
+
+function captureSiteTags(): { effects: string[]; flavors: string[] } {
+  const effectEls = document.querySelectorAll(
+    '[class*="strain-feelings"] li, [class*="StrainFeelings"] li, [data-test="strain-feelings"] li'
+  );
+  const flavorEls = document.querySelectorAll(
+    '[class*="strain-flavors"] li, [class*="StrainFlavors"] li, [data-test="strain-flavors"] li'
+  );
+
+  return {
+    effects: Array.from(effectEls).map((el) => el.textContent?.trim().toLowerCase() ?? "").filter(Boolean),
+    flavors: Array.from(flavorEls).map((el) => el.textContent?.trim().toLowerCase() ?? "").filter(Boolean),
+  };
+}
+
+function captureReviews(): ProductData["reviews"] {
+  const reviewEls = document.querySelectorAll('[data-test="review-card"], [class*="review-card"]');
+  const reviews: ProductData["reviews"] = [];
+  const now = new Date().toISOString();
+
+  reviewEls.forEach((el) => {
+    const text = el.querySelector('[class*="review-body"], p')?.textContent?.trim();
+    const ratingInput = el.querySelector('input[type="hidden"][name="rating"]') as HTMLInputElement | null;
+    const ratingStars = el.querySelectorAll('[class*="star--filled"], [class*="StarFilled"]').length;
+    if (text && text.length > 10) {
+      reviews.push({
+        text: text.slice(0, 300),
+        rating: ratingInput ? parseFloat(ratingInput.value) : ratingStars || undefined,
+        capturedAt: now,
+      });
+    }
+  });
+
+  return reviews.slice(0, 5);
 }
 
 export function parseLeafly(): ProductData | null {
-  // Try structured data first
-  const jsonLD = parseFromJsonLD();
+  // Try JSON-LD first (most reliable)
+  const jsonLdData = parseJsonLd();
 
-  // Product name
   const name =
-    jsonLD?.name ||
-    tryText('[data-testid="product-name"]') ||
-    tryText("h1.product-title") ||
-    tryText("h1[class*='ProductTitle']") ||
-    tryText("h1.pdp-product-title") ||
+    jsonLdData.name ||
+    tryText('[data-test="strain-name"]') ||
+    tryText("h1[class*='strain']") ||
     tryText("h1");
 
   if (!name) return null;
 
-  // Category breadcrumb is often the most reliable on Leafly
-  const breadcrumbs = document.querySelectorAll(
-    'nav[aria-label="breadcrumb"] a, [class*="breadcrumb"] a, [class*="Breadcrumb"] a'
-  );
-  const breadcrumbTexts = Array.from(breadcrumbs).map((el) => el.textContent?.trim() ?? "");
-  const categoryFromBreadcrumb = breadcrumbTexts.find(
-    (t) => t && !t.toLowerCase().includes("home") && !t.toLowerCase().includes("menu")
-  );
-
   const categoryRaw =
-    categoryFromBreadcrumb ||
-    tryText('[data-testid="product-category"]') ||
+    tryText('[data-test="product-category"]') ||
     tryText("[class*='category']") ||
-    tryText("[class*='Category']") ||
-    "";
+    document.querySelector("meta[property='product:category']")?.getAttribute("content") || "";
 
-  const category = normalizeCategory(categoryRaw);
+  const strainTypeEl = document.querySelector('[data-test="strain-type"], [class*="strain-type-tag"]');
+  const strainTypeRaw = strainTypeEl?.textContent?.trim() ?? "";
+  let strainType: ProductData["strainType"] | undefined;
+  if (strainTypeRaw.toLowerCase().includes("sativa")) strainType = "sativa";
+  else if (strainTypeRaw.toLowerCase().includes("indica")) strainType = "indica";
+  else if (strainTypeRaw.toLowerCase().includes("hybrid")) strainType = "hybrid";
 
-  // Strain type
-  const strainTypeRaw =
-    tryText('[data-testid="strain-type"]') ||
-    tryText("[class*='StrainType']") ||
-    tryText("[class*='strain-type']") ||
-    tryText(".strain-badge") ||
-    "";
-  const strainType = normalizeStrainType(strainTypeRaw);
+  const thcText =
+    tryText('[data-test="thc-percentage"]') ||
+    tryText("[class*='thc']") ||
+    document.querySelector('[class*="THC"]')?.nextElementSibling?.textContent?.trim() || "";
+  const thcPercent = extractPercentageNum(thcText);
 
-  // THC — Leafly typically shows "THC X%" in a dedicated element
-  const thcEl = document.querySelector(
-    '[data-testid="thc-content"], [class*="thc-content"], [class*="THCContent"]'
-  );
-  const thcText = thcEl?.textContent?.trim() ?? "";
-  const thc = extractPercentage(thcText) || thcText || undefined;
+  const cbdText =
+    tryText('[data-test="cbd-percentage"]') ||
+    tryText("[class*='cbd']") || "";
+  const cbdPercent = extractPercentageNum(cbdText);
 
-  // CBD
-  const cbdEl = document.querySelector(
-    '[data-testid="cbd-content"], [class*="cbd-content"], [class*="CBDContent"]'
-  );
-  const cbdText = cbdEl?.textContent?.trim() ?? "";
-  const cbd = extractPercentage(cbdText) || cbdText || undefined;
-
-  // Price
-  const price =
-    tryText('[data-testid="price"]') ||
-    tryText("[class*='price']") ||
-    tryText("[class*='Price']") ||
-    undefined;
-
-  // Weight
-  const weight =
-    tryText('[data-testid="weight"]') ||
-    tryText("[class*='weight']") ||
-    tryText("[class*='Weight']") ||
-    undefined;
-
-  // Brand
-  const brand =
-    jsonLD?.brand ||
-    tryText('[data-testid="brand-name"]') ||
-    tryText("[class*='BrandName']") ||
-    tryText("[class*='brand-name']") ||
-    undefined;
-
-  // Dispensary
-  const dispensary =
-    tryText('[data-testid="dispensary-name"]') ||
-    tryText("[class*='DispensaryName']") ||
-    document.querySelector("meta[property='og:site_name']")?.getAttribute("content") ||
-    undefined;
-
-  // Terpenes
   const terpeneEls = document.querySelectorAll(
-    '[data-testid="terpene-tag"], [class*="terpene"], [class*="Terpene"]'
+    '[data-test="terpene-name"], [class*="terpene-name"], [class*="TerpeneName"]'
   );
-  const terpenes =
-    terpeneEls.length > 0
-      ? Array.from(terpeneEls)
-          .map((el) => el.textContent?.trim() ?? "")
-          .filter(Boolean)
-          .filter((t) => t.length < 30) // filter out non-terpene content
-      : undefined;
+  const terpenes = terpeneEls.length > 0
+    ? Array.from(terpeneEls).map((el) => el.textContent?.trim() ?? "").filter(Boolean)
+    : undefined;
 
-  // Description
-  const rawDescription =
-    jsonLD?.rawDescription ||
-    tryText('[data-testid="product-description"]') ||
-    tryText("[class*='ProductDescription']") ||
-    tryText("[class*='description']") ||
-    undefined;
+  const priceText = tryText('[data-test="price"], [class*="price"]');
+  const priceMatch = priceText.match(/\$?\s*(\d+(?:\.\d+)?)/);
+  const priceAmount = priceMatch ? parseFloat(priceMatch[1]) : undefined;
 
-  // COA link
+  const dispensary =
+    tryText('[data-test="dispensary-name"]') ||
+    document.querySelector("meta[property='og:site_name']")?.getAttribute("content") || undefined;
+
   const coaLink =
-    (document.querySelector(
-      'a[href*="coa"], a[href*="lab-result"], a[href*="certificate-of-analysis"]'
-    ) as HTMLAnchorElement | null)?.href ?? undefined;
+    (document.querySelector('a[href*="coa"], a[href*="lab-result"]') as HTMLAnchorElement | null)?.href ?? undefined;
+
+  const imageUrls = Array.from(document.querySelectorAll('img[class*="product-image"], img[class*="strain-image"]'))
+    .map((el) => (el as HTMLImageElement).src)
+    .filter((src) => src && !src.includes("placeholder"))
+    .slice(0, 3);
+
+  const reviewCountText = tryText('[data-test="review-count"]');
+  const reviewCountMatch = reviewCountText.match(/(\d+)/);
 
   return {
     name,
-    brand: brand || undefined,
-    category,
+    brand: jsonLdData.brand || tryText('[data-test="brand"]') || undefined,
+    category: normalizeCategory(categoryRaw),
     strainType,
-    thc: thc || undefined,
-    cbd: cbd || undefined,
+    thc: thcPercent ? `${thcPercent}%` : undefined,
+    thcPercent,
+    cbd: cbdPercent ? `${cbdPercent}%` : undefined,
+    cbdPercent,
     terpenes,
-    weight: weight || undefined,
-    price: price || undefined,
+    terpenesParsed: terpenes?.map((t) => ({ name: t })),
+    price: priceText || undefined,
+    priceAmount,
     dispensary: dispensary || undefined,
     productUrl: window.location.href,
     source: "leafly",
-    rawDescription: rawDescription || undefined,
+    rawDescription: jsonLdData.rawDescription ||
+      tryText('[data-test="strain-description"]') || undefined,
     coaLink,
+    siteTags: captureSiteTags(),
+    reviews: captureReviews(),
+    reviewCount: reviewCountMatch ? parseInt(reviewCountMatch[1], 10) : undefined,
+    imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
   };
 }
