@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { InsightResponse, TerpeneDetail } from "../../lib/types";
+import type { StrainProfile, TerpeneDetail } from "../../lib/types";
 
 // Terpene emoji mapping
 const TERPENE_EMOJIS: Record<string, string> = {
@@ -92,7 +92,7 @@ const s = {
 };
 
 interface TerpenesSectionProps {
-  terpenes: InsightResponse["terpenes"];
+  terpenes: StrainProfile["terpenes"];
 }
 
 export function TerpenesSection({ terpenes }: TerpenesSectionProps) {

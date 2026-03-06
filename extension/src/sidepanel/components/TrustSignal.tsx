@@ -1,5 +1,5 @@
 import React from "react";
-import type { InsightResponse } from "../../lib/types";
+import type { StrainProfile } from "../../lib/types";
 
 const CONFIG = {
   verified: {
@@ -68,7 +68,7 @@ const s = {
 };
 
 interface TrustSignalProps {
-  signal: InsightResponse["trustSignal"];
+  signal: StrainProfile["trustSignal"];
 }
 
 export function TrustSignal({ signal }: TrustSignalProps) {

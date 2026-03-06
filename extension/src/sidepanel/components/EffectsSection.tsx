@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { InsightResponse } from "../../lib/types";
+import type { StrainProfile } from "../../lib/types";
 
 const s = {
   section: {
@@ -58,7 +58,7 @@ const s = {
 };
 
 interface EffectsSectionProps {
-  effects: InsightResponse["effects"];
+  effects: StrainProfile["effects"];
 }
 
 export function EffectsSection({ effects }: EffectsSectionProps) {

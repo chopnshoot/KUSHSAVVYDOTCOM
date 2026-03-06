@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { InsightResponse, ProductData } from "../../lib/types";
+import type { StrainProfile, ProductData } from "../../lib/types";
 
 const LEVEL_CONFIG = {
   strong: { label: "Strong", color: "#ef4444", bg: "#fef2f2", border: "#fecaca" },
@@ -67,7 +67,7 @@ const s = {
 type DoseLevel = "beginner" | "regular" | "experienced";
 
 interface DosingProps {
-  dosing: InsightResponse["dosing"];
+  dosing: StrainProfile["dosing"];
   productType?: ProductData["category"];
 }
 
